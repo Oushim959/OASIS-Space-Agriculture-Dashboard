@@ -1,0 +1,1 @@
+- [O.A.S.I.S. presentation principles](oasis-presentation-principles.md) — keep the project framing credible, readable, restrained, and separate from its telemetry dashboard.

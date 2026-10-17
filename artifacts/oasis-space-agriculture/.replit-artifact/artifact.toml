@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "O.A.S.I.S. — Space Agriculture"
+description = "A presentation-ready project website and interactive telemetry dashboard for O.A.S.I.S., a safety-gated crop-control concept for closed-loop space habitats. Explore the mission, crop profiles, synthetic sensor data, controller decisions, safety interventions, and a dedicated viewer slot for the physical prototype's 3D model."
+version = "1.0.0"
+id = "artifacts/oasis-space-agriculture"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19355
+
+[services.development]
+run = "pnpm --filter @workspace/oasis-space-agriculture run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/oasis-space-agriculture", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/oasis-space-agriculture/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19355"
+BASE_PATH = "/"
