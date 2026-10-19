@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 import {
   AlertTriangle, ArrowDown, ArrowRight, Check, FileUp, Gauge, Lightbulb,
   Menu, Pause, Play, Radio, ShieldCheck, X, Sun, Moon,
@@ -237,7 +237,6 @@ const arMore: Record<string, string> = {
   'Space Lead 2026 · offline synthetic demo': 'مسار الفضاء ٢٠٢٦ · عرض اصطناعي محلي',
 };
 const arAdditional: Record<string, string> = {
-  'Photo: NASA, plant experiment work aboard the International Space Station': 'الصورة: ناسا، تجربة نباتية على متن محطة الفضاء الدولية',
   'The language model reasons over a snapshot and proposes a structured response. Deterministic validation remains between every proposal and the actuator layer.': 'يستدل النموذج اللغوي من لقطة بيانات ويقترح استجابة منظمة. ويبقى التحقق الحتمي فاصلاً بين كل اقتراح وطبقة المشغلات.',
   'Air temp, RH, substrate moisture, CO₂, LED temperature and reservoir level.': 'حرارة الهواء والرطوبة النسبية ورطوبة الوسط الزراعي وثاني أكسيد الكربون وحرارة LED ومستوى الخزان.',
   'Calculate VPD from air temperature and relative humidity using Tetens approximation.': 'يُحسب عجز ضغط البخار من حرارة الهواء والرطوبة النسبية باستخدام تقريب تيتنز.',
@@ -316,7 +315,7 @@ const arJournal: Record<string, string> = {
   'Fresh food is part of the habitat.': 'الغذاء الطازج جزء من الموئل.',
   'For a long-duration crew, crops bring nutrition, variety and the everyday rhythm of tending living things. A spacecraft habitat, meanwhile, has little spare water or power and an atmosphere where each variable affects the next.': 'تمنح المحاصيل الطاقم في المهمات الطويلة تغذية متنوعة وإيقاعاً يومياً لرعاية الحياة. وفي الوقت نفسه، لا يملك موئل المركبة ماءً أو طاقة فائضين، كما يؤثر كل متغير في الغلاف الجوي على غيره.',
   'Four constraints, one living system': 'أربعة قيود، ونظام حي واحد',
-  'Plant growth in orbit · NASA Veggie research imagery': 'نمو النباتات في المدار · صورة بحثية لبرنامج فيجي التابع لناسا',
+  'Plant-only cultivation module · concept visual': 'وحدة زراعة نباتية · تصور مفاهيمي',
   'FIELD NOTE 01': 'ملاحظة ميدانية ٠١',
   'Grow with the limits in view.': 'ازرع مع إبقاء الحدود واضحة.',
   'O.A.S.I.S. links plant-relevant sensing to care recommendations. The model may propose; a small, inspectable rules layer decides what may proceed.': 'يربط O.A.S.I.S. الاستشعار المرتبط بالنبات بتوصيات العناية. يمكن للنموذج أن يقترح، لكن طبقة قواعد محدودة وقابلة للفحص هي التي تحدد ما يمكن تنفيذه.',
@@ -373,18 +372,19 @@ const arJournal: Record<string, string> = {
   'What the replay can—and cannot—say': 'ما الذي توضحه الإعادة وما لا توضحه',
   'The page replays eight synthetic notebook frames. Only potato has a recorded run; tomato shows its configured profile without borrowed readings. No live sensors, model calls, approval flow or actuator commands are connected.': 'تعيد الصفحة تشغيل ثمانية إطارات اصطناعية من الدفتر. للبطاطس قراءة مسجلة فقط؛ أما الطماطم فتُعرض بملفها المُعد دون استعارة قراءات. لا توجد حساسات حية أو اتصالات بالنموذج أو موافقات أو أوامر للمشغلات.',
   'Event organizers & sponsors': 'منظمو الفعالية والجهات الراعية',
-  'The supplied event poster identifies the Boeing Space Lead Hackathon Competition 2026 at Alfaisal University, 25–26 October 2026. It does not confirm the organizer or sponsor roster by role, so names and marks are held until verified. NASA imagery is credited to NASA; it does not imply O.A.S.I.S. affiliation or endorsement.': 'تُعرّف نشرة الفعالية المسابقة باسم Boeing Space Lead Hackathon Competition 2026 في جامعة الفيصل خلال 25–26 أكتوبر 2026. لكنها لا تحدد الجهات المنظمة أو الراعية بأدوار واضحة، لذلك لن تُعرض الأسماء أو الشعارات قبل التحقق. تُنسب صور ناسا إلى ناسا، ولا يعني استخدامها انتساباً أو تأييداً لـ O.A.S.I.S.',
+  'The supplied event poster identifies the Boeing Space Lead Hackathon Competition 2026 at Alfaisal University, 25–26 October 2026. It does not confirm organizer or sponsor roles, so names and marks are held until verified.': 'تُعرّف نشرة الفعالية المسابقة باسم Boeing Space Lead Hackathon Competition 2026 في جامعة الفيصل خلال 25–26 أكتوبر 2026. لكنها لا تؤكد أدوار الجهات المنظمة أو الراعية، لذلك لن تُعرض الأسماء أو الشعارات قبل التحقق.',
   'Tend the loop.': 'اعتنِ بالدورة.',
   'See the crop, the recorded frame and the rule outcome—without mistaking replay for live control.': 'شاهد المحصول والإطار المسجل ونتيجة القاعدة، دون الخلط بين الإعادة والتحكم المباشر.',
   'Open the offline dashboard': 'افتح لوحة البيانات المحلية',
   'OFFLINE REPLAY · NO LIVE CONTROL': 'إعادة محلية · لا يوجد تحكم حي',
   'Site preferences': 'تفضيلات الموقع',
-  'Tomato plants being examined in a controlled research environment': 'نباتات طماطم تُفحص في بيئة بحثية مضبوطة',
+  'Healthy leafy greens growing in a compact controlled cultivation module': 'خضراوات ورقية صحية تنمو في وحدة زراعة مضبوطة ومدمجة',
+  'Hydroponic root zone with visible roots and a measured irrigation line': 'منطقة جذور مائية تظهر فيها الجذور وخط ري مضبوط',
+  'Dwarf tomato plant bearing fruit in a controlled hydroponic chamber': 'نبات طماطم قزم يحمل ثماراً داخل حجرة زراعة مائية مضبوطة',
+  'Dwarf tomato plant in a controlled hydroponic growth chamber': 'نبات طماطم قزم في حجرة نمو مائية مضبوطة',
   'Potato plant growing in a terracotta-colored substrate pot': 'نبات بطاطس ينمو في أصيص بوسط زراعي بلون الطين',
   'Dwarf tomato plant with ripe fruit': 'نبات طماطم قزمية يحمل ثماراً ناضجة',
-  'Plant growth research in an orbital cultivation chamber': 'أبحاث نمو النباتات في حجرة زراعة مدارية',
-  'Plant experiment hardware inside a crewed space station': 'معدات تجربة نباتية داخل محطة فضائية مأهولة',
-  'NASA / PLANT EXPERIMENT IMAGE': 'ناسا / صورة تجربة نباتية',
+  'ROOT ZONE / CONCEPT VISUAL': 'منطقة الجذور / تصور مفاهيمي',
 };
 const arTranslations = { ...arText, ...arMore, ...arAdditional, ...arJournal };
 const toArabic = (value: string) => {
@@ -416,6 +416,41 @@ const toArabic = (value: string) => {
   return value;
 };
 
+type LocalizedProps = {
+  children?: ReactNode;
+  'aria-label'?: string;
+  title?: string;
+  alt?: string;
+  placeholder?: string;
+};
+
+function translateReactNode(node: ReactNode, language: 'en' | 'ar'): ReactNode {
+  if (language === 'en' || node == null) return node;
+  return Children.map(node, (child) => {
+    if (typeof child === 'string') {
+      const leading = child.match(/^\s*/)?.[0] ?? '';
+      const trailing = child.match(/\s*$/)?.[0] ?? '';
+      const text = child.trim();
+      return text ? `${leading}${toArabic(text)}${trailing}` : child;
+    }
+    if (!isValidElement<LocalizedProps>(child)) return child;
+
+    const translatedProps: Partial<LocalizedProps> = {};
+    (['aria-label', 'title', 'alt', 'placeholder'] as const).forEach((attribute) => {
+      const value = child.props[attribute];
+      if (value) translatedProps[attribute] = toArabic(value);
+    });
+    return cloneElement(child, {
+      ...translatedProps,
+      children: translateReactNode(child.props.children, language),
+    });
+  });
+}
+
+function LocalizedTree({ language, children }: { language: 'en' | 'ar'; children: ReactNode }) {
+  return <>{translateReactNode(children, language)}</>;
+}
+
 function useSitePreferences() {
   const [language, setLanguage] = useState<'en' | 'ar'>(() => {
     const requested = new URLSearchParams(window.location.search).get('lang');
@@ -431,70 +466,16 @@ function useSitePreferences() {
     localStorage.setItem('oasis-language', language);
     document.documentElement.lang = language;
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
-    const originals = new WeakMap<Text, string>();
-    const originalAttrs = new WeakMap<Element, Map<string, string>>();
-    const reverse = new Map(Object.entries(arTranslations).map(([en, ar]) => [ar, en]));
-    const translate = () => {
-      const walker = document.createTreeWalker(document.querySelector('.oasis-app') ?? document.body, NodeFilter.SHOW_TEXT);
-      let node: Node | null;
-      while ((node = walker.nextNode())) {
-        const text = node as Text;
-        const current = text.nodeValue ?? '';
-        const key = current.trim();
-        if (!key) continue;
-        if (!originals.has(text)) originals.set(text, reverse.get(key) ?? current);
-        let original = originals.get(text) ?? current;
-        const previousArabic = reverse.has(key);
-        const expected = language === 'ar' ? (arTranslations[original.trim()] ?? original.trim()) : original.trim();
-        if (current.trim() !== expected && !previousArabic) {
-          original = current;
-          originals.set(text, original);
-        } else if (previousArabic) {
-          original = reverse.get(key) ?? original;
-          originals.set(text, original);
-        }
-        const clean = original.trim();
-        const translated = language === 'ar' ? toArabic(clean) : clean;
-        const leading = original.match(/^\s*/)?.[0] ?? '';
-        const trailing = original.match(/\s*$/)?.[0] ?? '';
-        const next = `${leading}${translated}${trailing}`;
-        if (text.nodeValue !== next) text.nodeValue = next;
-      }
-      document.querySelectorAll('.oasis-app [aria-label], .oasis-app [title], .oasis-app [alt]').forEach((el) => {
-        const element = el as HTMLElement;
-        ['aria-label', 'title', 'alt'].forEach((attr) => {
-          const value = element.getAttribute(attr);
-          if (!value) return;
-          let attrs = originalAttrs.get(element);
-          if (!attrs) { attrs = new Map(); originalAttrs.set(element, attrs); }
-          let original = attrs.get(attr) ?? reverse.get(value) ?? value;
-          const expected = language === 'ar' ? toArabic(original) : original;
-          if (value !== expected && !reverse.has(value)) {
-            original = value;
-            attrs.set(attr, original);
-          } else if (reverse.has(value)) {
-            original = reverse.get(value) ?? original;
-            attrs.set(attr, original);
-          } else if (!attrs.has(attr)) {
-            attrs.set(attr, original);
-          }
-          element.setAttribute(attr, language === 'ar' ? toArabic(original) : original);
-        });
-      });
-    };
-    translate();
-    const observer = new MutationObserver(translate);
-    observer.observe(document.querySelector('.oasis-app') ?? document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['aria-label', 'title', 'alt'] });
-    return () => observer.disconnect();
   }, [language]);
   useEffect(() => {
     localStorage.setItem('oasis-theme', theme);
     document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.style.colorScheme = theme;
   }, [theme]);
   return { language, setLanguage, theme, setTheme };
 }
 
-function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop: CropKey; activeFrame: number }) {
+function TelemetryChart({ metric, crop, activeFrame, language }: { metric: MetricKey; crop: CropKey; activeFrame: number; language: 'en' | 'ar' }) {
   const chartValues = useMemo(() => frames.map((f) =>
     metric === 'moisture' ? f.moisture : metric === 'air' ? f.air : vpdFor(f.air, f.rh),
   ), [metric]);
@@ -511,6 +492,7 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
   const formatValue = (value: number) => `${value.toFixed(metric === 'vpd' ? 2 : 1)} ${config.unit}`;
   const gridValues = metric === 'moisture' ? [0, 20, 40, 60] : metric === 'air' ? [10, 20, 30] : [0, 0.5, 1, 1.5, 2];
   return (
+    <LocalizedTree language={language}>
     <>
       <div className="card-top">
          <div><h4>{config.title} · {config.unit}</h4><p>Target window shaded · 15 min sample cadence</p></div>
@@ -540,6 +522,7 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
         </svg>
       </div>
     </>
+    </LocalizedTree>
   );
 }
 
@@ -607,6 +590,7 @@ function AppPage() {
   };
   return (
     <div className={`oasis-app ${isDashboard ? 'dashboard-site' : 'field-journal'}`}>
+      <LocalizedTree language={language}>
       <header className={`site-header ${!isDashboard ? 'journal-header' : ''}`}>
         <div className="shell nav-inner">
           <Link className="brand" href="/" aria-label="O.A.S.I.S. — Orbital Adaptive Smart Irrigation and Sustenance home">
@@ -667,8 +651,8 @@ function AppPage() {
             </div>
             <div className="mission-feature">
               <figure className="mission-photo">
-                <img src="/images/nasa-veggie.jpg" alt="Plant growth research in an orbital cultivation chamber" />
-                <figcaption>Plant growth in orbit · NASA Veggie research imagery</figcaption>
+                <img src="/images/oasis-habitat-canopy.jpg" alt="Healthy leafy greens growing in a compact controlled cultivation module" />
+                <figcaption>Plant-only cultivation module · concept visual</figcaption>
               </figure>
               <div className="mission-note">
                 <span className="note-index">FIELD NOTE 01</span>
@@ -688,12 +672,12 @@ function AppPage() {
             </div>
             <div className="constraint-mosaic">
               <article className="constraint-card constraint-water">
-                <img src="/images/nasa-plant-experiment.png" alt="Plant experiment hardware inside a crewed space station" />
-                <small className="image-credit">NASA / PLANT EXPERIMENT IMAGE</small>
+                <img src="/images/oasis-root-zone.jpg" alt="Hydroponic root zone with visible roots and a measured irrigation line" />
+                <small className="image-credit">ROOT ZONE / CONCEPT VISUAL</small>
                 <div className="constraint-card-copy"><span>01 / WATER</span><h3>Deliver carefully.</h3><p>Too little water stresses a crop. Too much can saturate its medium and leave roots short of oxygen.</p></div>
               </article>
               <article className="constraint-card constraint-air">
-                <img src="/images/oasis-tomato-research.jpg" alt="Tomato plants being examined in a controlled research environment" />
+                <img src="/images/oasis-tomato-canopy.jpg" alt="Dwarf tomato plant in a controlled hydroponic growth chamber" />
                 <div className="constraint-card-copy"><span>02 / ATMOSPHERE</span><h3>Read the canopy.</h3><p>Humidity, temperature and CO₂ interact with transpiration and photosynthesis. One threshold cannot tell the whole story.</p></div>
               </article>
               <article className="constraint-card constraint-power">
@@ -846,7 +830,7 @@ function AppPage() {
                 </select></label>
               </div>
               <div className="history-plot">
-                {hasReplayData ? <TelemetryChart metric={metric} crop={crop} activeFrame={frame} /> : <div className="chart-unavailable">No dwarf tomato sensor run or history is available.</div>}
+                {hasReplayData ? <TelemetryChart metric={metric} crop={crop} activeFrame={frame} language={language} /> : <div className="chart-unavailable">No dwarf tomato sensor run or history is available.</div>}
               </div>
               <div className={`history-timeline ${!hasReplayData ? 'timeline-unavailable' : ''}`}>
                 <div className="timeline-label"><label htmlFor="frame-range">Replay position</label><span>{hasReplayData ? `${formatTime(frame)} · frame ${frame + 1} of ${frames.length}` : 'No samples recorded'}</span></div>
@@ -887,7 +871,7 @@ function AppPage() {
                 return (
                   <article className={`crop-profile-card crop-${key}-editorial`} key={key}>
                     <figure className="crop-photo">
-                      <img src={key === 'potato' ? '/images/potato-plant-cutout.png' : '/images/oasis-tomato-research.jpg'} alt={key === 'potato' ? 'Potato plant growing in a terracotta-colored substrate pot' : 'Tomato plants being examined in a controlled research environment'} />
+                      <img src={key === 'potato' ? '/images/potato-plant-cutout.png' : '/images/tomato-plant-cutout.png'} alt={key === 'potato' ? 'Potato plant growing in a terracotta-colored substrate pot' : 'Dwarf tomato plant bearing fruit in a controlled hydroponic chamber'} />
                       <figcaption><span>{key === 'potato' ? 'TUBER CROP' : 'FRUITING CROP'}</span><span>PROFILE / 0{key === 'potato' ? '1' : '2'}</span></figcaption>
                     </figure>
                     <div className="crop-profile-content">
@@ -922,7 +906,7 @@ function AppPage() {
                {modelFile ? (
                  <>
                    <div className="model-status">LOCAL MODEL PREVIEW</div>
-                   <ModelViewer file={modelFile} onError={setModelError} />
+                  <ModelViewer file={modelFile} onError={setModelError} language={language} />
                    <span className="viewer-hint">DRAG TO ORBIT · SCROLL TO ZOOM</span>
                  </>
                ) : (
@@ -987,7 +971,7 @@ function AppPage() {
               </details>
               <details id="credits" className="journal-accordion">
                 <summary><span className="accordion-number">05</span><span>Event organizers &amp; sponsors</span><span className="accordion-symbol" aria-hidden="true" /></summary>
-                <div className="accordion-body"><p>The supplied event poster identifies the Boeing Space Lead Hackathon Competition 2026 at Alfaisal University, 25–26 October 2026. It does not confirm the organizer or sponsor roster by role, so names and marks are held until verified. NASA imagery is credited to NASA; it does not imply O.A.S.I.S. affiliation or endorsement.</p></div>
+                <div className="accordion-body"><p>The supplied event poster identifies the Boeing Space Lead Hackathon Competition 2026 at Alfaisal University, 25–26 October 2026. It does not confirm organizer or sponsor roles, so names and marks are held until verified.</p></div>
               </details>
             </div>
           </div>
@@ -1020,6 +1004,7 @@ function AppPage() {
           <div className="footer-links"><Link href="/">Project overview</Link><a href="#dashboard">Back to dashboard top ↑</a></div>
         </div>
       </footer>}
+      </LocalizedTree>
     </div>
   );
 }

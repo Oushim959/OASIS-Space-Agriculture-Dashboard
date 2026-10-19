@@ -1149,6 +1149,7 @@ html[dir="rtl"] .hero-image figcaption { direction: rtl; }
 .crop-photo { position: relative; height: 350px; margin: 0; overflow: hidden; background: #e6e6d8; }
 .crop-photo img { width: 100%; height: 100%; object-fit: cover; }
 .crop-potato-editorial .crop-photo img { object-fit: contain; padding: 10px 10px 0; }
+.crop-tomato-editorial .crop-photo img { object-fit: contain; padding: 10px 10px 0; }
 .crop-photo figcaption { position: absolute; inset: auto 18px 16px; display: flex; justify-content: space-between; color: #f8f5e9; font: 13px var(--app-font-mono); letter-spacing: .08em; text-shadow: 0 1px 8px rgba(0,0,0,.5); }
 .crop-profile-content { padding: 27px 29px 25px; }
 .crop-title-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
@@ -1392,4 +1393,96 @@ html[dir="rtl"] .field-journal .mission-note blockquote { border-right: 0; }
   .journal-footer-links { justify-content: flex-start; gap: 8px 17px; font-size: 13px; }
   .footer-disclaimer { grid-column: auto; font-size: 13px; }
   html[dir="rtl"] .field-journal .journal-footer-links { justify-content: flex-start; }
+}
+
+/* Complete the dashboard palette in dark mode; several dashboard-specific
+   component rules intentionally use light-mode colors for the editorial view. */
+html.dark #dashboard .plant-switcher,
+html.dark #dashboard .proposal-panel,
+html.dark #dashboard .history-section {
+  background: #26352a;
+  border-color: rgba(210, 226, 198, .24);
+}
+html.dark #dashboard .plant-tab { color: #d8e4d1; }
+html.dark #dashboard .plant-tab span { color: #c5d3bf; opacity: 1; }
+html.dark #dashboard .plant-tab.active {
+  background: #587a49;
+  color: #fffdf4;
+}
+html.dark #dashboard .plant-tab.active span { color: #e8efdf; }
+html.dark #dashboard .replay-button { background: #c9df8e; color: #1d3022; }
+html.dark #dashboard .botanical-stage {
+  border-color: rgba(213, 230, 201, .2);
+  background: linear-gradient(110deg, #26392d, #22342a 49%, #293b2e);
+}
+html.dark #dashboard .plant-kicker { color: #bfd3a6; }
+html.dark #dashboard .range-explainer,
+html.dark #dashboard .frame-readout,
+html.dark #dashboard .signal-context,
+html.dark #dashboard .signal-target,
+html.dark #dashboard .signal-target span,
+html.dark #dashboard .signal-card-head,
+html.dark #dashboard .plant-portrait figcaption,
+html.dark #dashboard .pipeline-step-label,
+html.dark #dashboard .proposal-key,
+html.dark #dashboard .history-heading p,
+html.dark #dashboard .card-top p,
+html.dark #dashboard .legend,
+html.dark #dashboard .metric-picker,
+html.dark #dashboard .timeline-label,
+html.dark #dashboard .frame-times {
+  color: #d0dccb;
+}
+html.dark #dashboard .frame-readout b,
+html.dark #dashboard .signal-target b { color: #f0f4e9; }
+html.dark #dashboard .data-mode {
+  color: #c4dcae;
+  background: rgba(166, 199, 125, .16);
+}
+html.dark #dashboard .stage-note { color: #d3dfca; }
+html.dark #dashboard .plant-portrait figcaption,
+html.dark #dashboard .dash-section-heading,
+html.dark #dashboard .signal-card,
+html.dark #dashboard .pipeline-track,
+html.dark #dashboard .pipeline-step + .pipeline-step,
+html.dark #dashboard .proposal-key,
+html.dark #dashboard .execution-status {
+  border-color: rgba(213, 230, 201, .2);
+}
+html.dark #dashboard .signal-temperature { --signal: #efa64f; }
+html.dark #dashboard .signal-moisture { --signal: #57b8b5; }
+html.dark #dashboard .signal-vpd { --signal: #b69add; }
+html.dark #dashboard .signal-state.outside,
+html.dark #dashboard .execution-status b { color: #f0b975; }
+html.dark #dashboard .pipeline-step-number { color: #b6c7ae; }
+html.dark #dashboard .pipeline-track.no-run .pipeline-step b { color: #c7d1c1; }
+html.dark #dashboard .chart-unavailable { background: #344439; color: #d6e0cf; }
+
+/* Arabic uses connected glyph shaping: remove Latin tracking and negative
+   display-font spacing, and give Arabic headings enough vertical leading. */
+html[dir="rtl"] body,
+html[dir="rtl"] .oasis-app,
+html[dir="rtl"] .oasis-app :where(*) {
+  font-family: "Noto Sans Arabic", "DM Sans", Tahoma, sans-serif !important;
+  letter-spacing: normal !important;
+}
+html[dir="rtl"] .oasis-app .brand-word {
+  font-family: var(--app-font-sans) !important;
+  letter-spacing: .08em !important;
+}
+html[dir="rtl"] .oasis-app .hero-mark,
+html[dir="rtl"] .oasis-app .hero-mark * {
+  font-family: var(--app-font-mono) !important;
+  letter-spacing: .05em !important;
+}
+html[dir="rtl"] .oasis-app :is(h1, h2, h3, h4, .display) { line-height: 1.35 !important; }
+html[dir="rtl"] .field-journal .hero-title {
+  font-size: clamp(54px, 10.5vw, 136px);
+  line-height: 1.28 !important;
+}
+html[dir="rtl"] .field-journal .hero-title span:last-child { font-size: .78em; }
+html[dir="rtl"] .oasis-app .plant-latin,
+html[dir="rtl"] .oasis-app .crop-latin {
+  direction: ltr;
+  font-family: var(--app-font-serif) !important;
 }

@@ -6,6 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 type ModelViewerProps = {
   file: File;
   onError: (message: string) => void;
+  language: 'en' | 'ar';
 };
 
 function disposeObject(object: THREE.Object3D) {
@@ -26,7 +27,7 @@ function disposeObject(object: THREE.Object3D) {
   });
 }
 
-export default function ModelViewer({ file, onError }: ModelViewerProps) {
+export default function ModelViewer({ file, onError, language }: ModelViewerProps) {
   const mountRef = useRef<HTMLDivElement>(null);
   const onErrorRef = useRef(onError);
   const [loading, setLoading] = useState(true);
@@ -154,7 +155,7 @@ export default function ModelViewer({ file, onError }: ModelViewerProps) {
 
   return (
     <div className="model-viewer" ref={mountRef} aria-busy={loading}>
-      {loading && <span className="model-loading">Preparing local model preview…</span>}
+      {loading && <span className="model-loading">{language === 'ar' ? 'جارٍ تجهيز معاينة النموذج المحلي…' : 'Preparing local model preview…'}</span>}
     </div>
   );
 }
