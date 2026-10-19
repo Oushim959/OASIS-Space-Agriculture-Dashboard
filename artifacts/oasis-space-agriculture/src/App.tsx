@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import {
-  Activity, AlertTriangle, ArrowDown, ArrowRight, Atom, Beaker, Bolt,
-  Check, ClipboardList, Cpu, Droplets,
+  Activity, AlertTriangle, ArrowDown, ArrowRight, Beaker, Bolt,
+  Check, Cpu, Droplets,
   FileUp, FlaskConical, Gauge, Lightbulb, Menu, Pause, Play,
   Radio, ShieldCheck, Sprout, Thermometer, Waves, X,
 } from 'lucide-react';
@@ -59,85 +59,26 @@ function LogoMark() {
   );
 }
 
-function HabitatIllustration() {
-  return (
-    <svg className="habitat-svg" viewBox="0 0 500 390" role="img" aria-label="Technical illustration of a closed-loop crop habitat in a spacecraft module">
-      <defs>
-        <linearGradient id="glass" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0" stopColor="#17374a" stopOpacity=".78" />
-          <stop offset="1" stopColor="#0d1d2d" stopOpacity=".18" />
-        </linearGradient>
-        <linearGradient id="soil" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#435a52" />
-          <stop offset="1" stopColor="#253a3d" />
-        </linearGradient>
-      </defs>
-      <g fill="none" stroke="#4b7580" strokeWidth="1">
-        <path d="M54 84h83M54 84v206M54 290h47M416 92h34M416 282h35" opacity=".65" />
-        <path d="M44 99h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9m-9 12h9" opacity=".4" />
-        <path d="M442 112h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14m-14 12h14" opacity=".4" />
-      </g>
-      <g transform="translate(92 54)">
-        <path d="M96 19h127c38 0 69 31 69 69v166c0 21-17 38-38 38H99c-25 0-45-20-45-45V66c0-26 16-47 42-47Z" fill="url(#glass)" stroke="#70a6ab" strokeWidth="2" />
-        <path d="M95 42h127c27 0 48 22 48 49v127H76V65c0-13 8-23 19-23Z" fill="#0b1b28" fillOpacity=".68" stroke="#30616c" />
-        <path d="M74 218h197v37c0 11-9 20-20 20H94c-11 0-20-9-20-20Z" fill="url(#soil)" stroke="#88a49a" />
-        <path d="M83 218c36-7 56 4 89-2s51 3 96-1" fill="none" stroke="#6cd59e" strokeWidth="2" />
-        <g stroke="#76d5a1" strokeWidth="2" fill="none" strokeLinecap="round">
-          <path d="M118 214v-63m0 22-18-20m18 32 20-21m-20 7-10-19" />
-          <path d="M174 215v-94m0 35-20-24m20 48 24-27m-24 3-14-22m14 45-8 19" />
-          <path d="M232 215v-70m0 31-16-20m16 39 18-21" />
-        </g>
-        <g fill="#85e0a5">
-          <ellipse cx="101" cy="151" rx="12" ry="5" transform="rotate(35 101 151)" />
-          <ellipse cx="139" cy="171" rx="12" ry="5" transform="rotate(-35 139 171)" />
-          <ellipse cx="154" cy="121" rx="12" ry="5" transform="rotate(35 154 121)" />
-          <ellipse cx="196" cy="155" rx="13" ry="5" transform="rotate(-45 196 155)" />
-          <ellipse cx="160" cy="144" rx="12" ry="5" transform="rotate(-30 160 144)" />
-          <ellipse cx="216" cy="176" rx="12" ry="5" transform="rotate(-42 216 176)" />
-        </g>
-        <g fill="none" stroke="#72d7eb" strokeWidth="1.5" opacity=".8">
-          <path d="M111 82h109M111 90h109" />
-          <path d="M118 95v12m21-12v12m21-12v12m21-12v12m21-12v12" />
-        </g>
-        <g stroke="#55d9af" fill="#0f2630" strokeWidth="1.5">
-          <rect x="281" y="90" width="38" height="32" rx="4" />
-          <circle cx="300" cy="105" r="6" />
-          <path d="M281 138h38v14h-38z" />
-          <path d="M272 241h23v14h-23z" />
-        </g>
-        <path d="M300 122v16m0 14v89m-9-1v-13h18v13" stroke="#63dce1" fill="none" strokeDasharray="3 3" />
-        <path d="M74 241h-23v-98h23m197 62h24v70h-26" stroke="#5a9eab" fill="none" strokeWidth="1.5" />
-        <path d="M50 143c-20 0-20 32 0 32m295 26c21 0 21 30 0 30" fill="none" stroke="#65d8e7" strokeWidth="1.5" strokeDasharray="4 4" />
-        <circle cx="52" cy="159" r="4" fill="#65d8e7" /><circle cx="344" cy="214" r="4" fill="#65d8e7" />
-      </g>
-      <g stroke="#5e8d93" strokeWidth="1">
-        <path d="M151 73h-69l-22 4" /><path d="M154 300H82l-19 3" />
-        <path d="M381 69h34l17 9" /><path d="M376 296h34l18 11" />
-      </g>
-      <g fill="#6de4b3"><circle cx="61" cy="77" r="2.5"/><circle cx="63" cy="303" r="2.5"/><circle cx="432" cy="78" r="2.5"/><circle cx="428" cy="307" r="2.5"/></g>
-    </svg>
-  );
-}
-
 function CropPlant({ crop }: { crop: CropKey }) {
+  const leaf = (cx: number, cy: number, r: number, c = '#4f8f3a') => <ellipse cx={cx} cy={cy} rx="15" ry="6.5" fill={c} transform={`rotate(${r} ${cx} ${cy})`} />;
   if (crop === 'potato') {
     return (
-      <svg className="crop-plant" viewBox="0 0 116 130" width="105" height="118" role="img" aria-label="Potato plant and tuber illustration">
-        <path d="M57 102V47m0 27L38 57m19 29 20-28m-20-1-14-17m14 50 8-26" fill="none" stroke="#72d69d" strokeWidth="2.5" strokeLinecap="round" />
-        <g fill="#7cdda2"><ellipse cx="37" cy="55" rx="14" ry="6" transform="rotate(27 37 55)"/><ellipse cx="78" cy="55" rx="14" ry="6" transform="rotate(-35 78 55)"/><ellipse cx="42" cy="39" rx="13" ry="5" transform="rotate(40 42 39)"/><ellipse cx="64" cy="59" rx="13" ry="5" transform="rotate(-45 64 59)"/></g>
-        <path d="M18 101h80" stroke="#597d75" strokeWidth="1.5" strokeDasharray="3 3" />
-        <g fill="#bea276" stroke="#ddc18c" strokeWidth="1"><ellipse cx="42" cy="110" rx="8" ry="5"/><ellipse cx="59" cy="115" rx="9" ry="6"/><ellipse cx="76" cy="108" rx="7" ry="5"/></g>
-        <path d="M57 98c-2 9-9 9-15 10m15-8c3 10 9 10 15 10m-15-10 0 13" fill="none" stroke="#95b49c" strokeWidth="1.4"/>
+      <svg className="crop-plant" viewBox="0 0 120 140" role="img" aria-label="Potato plant and tuber illustration">
+        <path d="M60 104V40m0 34L40 56m20 28 22-28m-22-2-14-18" fill="none" stroke="#3b7a34" strokeWidth="3" strokeLinecap="round" />
+        {leaf(38, 54, 27)}{leaf(82, 54, -35, '#6aa543')}{leaf(44, 36, 40, '#6aa543')}{leaf(66, 58, -45)}{leaf(60, 30, -80, '#3b7a34')}
+        <g fill="#9a6fcf"><circle cx="60" cy="24" r="3.5" /><circle cx="68" cy="28" r="3" /></g>
+        <path d="M14 104h92" stroke="#8a6a45" strokeWidth="2" strokeDasharray="3 4" />
+        <g fill="#d6b27a" stroke="#a9814d" strokeWidth="1.2"><ellipse cx="42" cy="116" rx="10" ry="6.5" /><ellipse cx="62" cy="122" rx="11" ry="7" /><ellipse cx="82" cy="114" rx="8.5" ry="6" /></g>
       </svg>
     );
   }
   return (
-    <svg className="crop-plant" viewBox="0 0 116 130" width="105" height="118" role="img" aria-label="Dwarf tomato plant with fruit illustration">
-      <path d="M58 101V39m0 26L36 53m22 24 22-20m-22-1L45 39m13 45 8-20" fill="none" stroke="#72d69d" strokeWidth="2.5" strokeLinecap="round" />
-      <g fill="#7cdda2"><ellipse cx="36" cy="51" rx="14" ry="6" transform="rotate(27 36 51)"/><ellipse cx="79" cy="55" rx="14" ry="6" transform="rotate(-35 79 55)"/><ellipse cx="45" cy="37" rx="12" ry="5" transform="rotate(40 45 37)"/><ellipse cx="68" cy="66" rx="13" ry="5" transform="rotate(-45 68 66)"/></g>
-      <g fill="#d96c5d" stroke="#f09276"><circle cx="37" cy="77" r="8"/><circle cx="78" cy="83" r="9"/><circle cx="58" cy="95" r="7"/></g>
-      <path d="M18 102h80" stroke="#597d75" strokeWidth="1.5" />
-      <path d="M37 82v17m41-7v7m-20-9v12" stroke="#8db19a" />
+    <svg className="crop-plant" viewBox="0 0 120 140" role="img" aria-label="Dwarf tomato plant with fruit illustration">
+      <path d="M60 110V36m0 30L36 52m24 26 24-22m-24-2L46 36" fill="none" stroke="#3b7a34" strokeWidth="3" strokeLinecap="round" />
+      {leaf(36, 50, 27)}{leaf(84, 54, -35, '#6aa543')}{leaf(46, 34, 40, '#6aa543')}{leaf(70, 66, -45)}
+      <g fill="#d4452f" stroke="#a82e1d" strokeWidth="1.2"><circle cx="38" cy="86" r="9" /><circle cx="82" cy="92" r="10" /><circle cx="60" cy="102" r="8" /></g>
+      <g fill="#3b7a34"><path d="M32 78l6 4 6-4-6 1zM76 83l6 4 6-4-6 1z" /></g>
+      <path d="M14 112h92" stroke="#8a6a45" strokeWidth="2" />
     </svg>
   );
 }
@@ -145,32 +86,19 @@ function CropPlant({ crop }: { crop: CropKey }) {
 function CutawayDiagram() {
   return (
     <svg className="cutaway" viewBox="0 0 540 290" role="img" aria-label="Annotated modular crop habitat cutaway showing lighting, sensing, crop zone, reservoir and control unit">
-      <defs>
-        <linearGradient id="chamber" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stopColor="#173146" stopOpacity=".8" /><stop offset="1" stopColor="#102231" stopOpacity=".65" />
-        </linearGradient>
-      </defs>
-      <path d="M136 31h259c14 0 25 11 25 25v163H111V56c0-14 11-25 25-25Z" fill="url(#chamber)" stroke="#57828b" strokeWidth="1.5" />
-      <path d="M122 51h286v28H122z" fill="#152b3b" stroke="#476974" />
-      <path d="M141 59h248" stroke="#64d9eb" strokeWidth="3" strokeDasharray="12 6" />
-      <path d="M128 181h273v31H128z" fill="#594e40" stroke="#9d947b" />
-      <path d="M128 181c42-5 67 4 99 0s60 3 90 0 47 2 84 0" fill="none" stroke="#68d89f" strokeWidth="2" />
-      <g stroke="#74d89c" strokeWidth="2" fill="none" strokeLinecap="round">
+      <rect x="110" y="30" width="310" height="200" rx="26" fill="#eef3dd" stroke="#2f5d3a" strokeWidth="2" />
+      <rect x="124" y="46" width="282" height="26" rx="8" fill="#f2c4dc" stroke="#b5527f" />
+      <path d="M140 59h250" stroke="#b5527f" strokeWidth="3" strokeDasharray="12 6" />
+      <rect x="124" y="180" width="282" height="34" rx="6" fill="#a9825a" stroke="#6f5233" />
+      <g stroke="#3b7a34" strokeWidth="3" fill="none" strokeLinecap="round">
         <path d="M182 180v-75m0 28-20-19m20 36 19-20" /><path d="M243 180V91m0 35-21-19m21 45 22-25" /><path d="M304 180v-70m0 28-18-19m18 39 19-20" /><path d="M358 180v-55m0 22-17-16" />
       </g>
-      <g fill="#82e0a4"><ellipse cx="162" cy="111" rx="13" ry="5" transform="rotate(38 162 111)"/><ellipse cx="201" cy="130" rx="13" ry="5" transform="rotate(-35 201 130)"/><ellipse cx="222" cy="105" rx="13" ry="5" transform="rotate(35 222 105)"/><ellipse cx="266" cy="151" rx="13" ry="5" transform="rotate(-42 266 151)"/><ellipse cx="286" cy="118" rx="13" ry="5" transform="rotate(40 286 118)"/><ellipse cx="323" cy="137" rx="12" ry="5" transform="rotate(-42 323 137)"/></g>
-      <rect x="428" y="104" width="55" height="53" rx="6" fill="#152f3b" stroke="#59d2c3" />
-      <path d="M395 65h28v39m-1 56v29h-19" fill="none" stroke="#60dce3" strokeDasharray="3 4" />
-      <path d="M137 226h80v27h-80z" fill="#182a38" stroke="#57828b" />
-      <path d="M146 236h60m-56 6h51" stroke="#58d8e3" strokeWidth="2" />
-      <path d="M219 238h24v-23m0-3v-17m0-3v-10" fill="none" stroke="#58d8e3" strokeDasharray="3 3" />
-      <path d="M344 211v33h37v-24" fill="#142938" stroke="#648d91" />
-      <path d="M351 231h24" stroke="#61d7e1" strokeWidth="2" />
-      <path d="M300 78v-15" stroke="#62d8ed" strokeWidth="2" />
-        <circle cx="300" cy="59" r="5" fill="#62d8ed" /><path d="M294 60h12m-6-6v12" stroke="#071822" />
-      <path d="M114 41H72m37 6H72m106-22v8m85-8v8m60-8v8" stroke="#5f9299" />
-      <path d="M72 41l-7 4 7 4m346 48h20" stroke="#5f9299" fill="none" />
-      <g fill="#63dcb3"><circle cx="72" cy="44" r="2"/><circle cx="422" cy="96" r="2"/><circle cx="190" cy="264" r="2"/><circle cx="381" cy="258" r="2"/></g>
+      <g fill="#6aa543"><ellipse cx="162" cy="111" rx="14" ry="6" transform="rotate(38 162 111)" /><ellipse cx="201" cy="130" rx="14" ry="6" transform="rotate(-35 201 130)" /><ellipse cx="222" cy="105" rx="14" ry="6" transform="rotate(35 222 105)" /><ellipse cx="266" cy="151" rx="14" ry="6" transform="rotate(-42 266 151)" /><ellipse cx="286" cy="118" rx="14" ry="6" transform="rotate(40 286 118)" /><ellipse cx="323" cy="137" rx="13" ry="6" transform="rotate(-42 323 137)" /></g>
+      <rect x="440" y="104" width="62" height="56" rx="10" fill="#e3f0ef" stroke="#2a8c8c" strokeWidth="1.5" />
+      <path d="M420 132h20M330 232v18h-80" fill="none" stroke="#2a8c8c" strokeWidth="1.5" strokeDasharray="3 4" />
+      <rect x="140" y="232" width="110" height="34" rx="8" fill="#dbeef2" stroke="#2a8c8c" />
+      <rect x="146" y="252" width="98" height="8" rx="4" fill="#2a8c8c" opacity=".5" />
+      <g fontFamily="DM Sans" fontSize="13" fill="#2b4a33"><text x="130" y="22">LED lighting</text><text x="440" y="98">Control unit</text><text x="140" y="284">Reservoir</text><text x="270" y="204" fill="#fff">Root zone</text></g>
     </svg>
   );
 }
@@ -180,10 +108,10 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
     metric === 'moisture' ? f.moisture : metric === 'air' ? f.air : vpdFor(f.air, f.rh),
   ), [metric]);
   const config = metric === 'moisture'
-    ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#93c982', unit: '%', title: 'Substrate moisture' }
+    ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#2a8c8c', unit: '%', title: 'Substrate moisture' }
     : metric === 'air'
-      ? { min: 10, max: 32, target: cropData[crop].air, color: '#e0a56d', unit: '°C', title: 'Air temperature' }
-      : { min: 0, max: 2.2, target: cropData[crop].vpd, color: '#75bcd6', unit: 'kPa', title: 'Derived VPD' };
+      ? { min: 10, max: 32, target: cropData[crop].air, color: '#d9822b', unit: '°C', title: 'Air temperature' }
+      : { min: 0, max: 2.2, target: cropData[crop].vpd, color: '#7b5ea7', unit: 'kPa', title: 'Derived VPD' };
   const W = 600, H = 225, padL = 36, padR = 12, padT = 12, padB = 28;
   const x = (i: number) => padL + (i * (W - padL - padR)) / 7;
   const y = (v: number) => padT + ((config.max - v) / (config.max - config.min)) * (H - padT - padB);
@@ -214,7 +142,7 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
           ))}
           <path d={path} className="chart-line" stroke={config.color} />
           {chartValues.map((value, i) => (
-            <circle key={i} cx={x(i)} cy={y(value)} r={i === activeFrame ? 5 : 3} fill={i === activeFrame ? '#f5f0d2' : config.color} className="chart-point">
+            <circle key={i} cx={x(i)} cy={y(value)} r={i === activeFrame ? 5 : 3} fill={i === activeFrame ? '#1f3a28' : config.color} className="chart-point">
               <title>{formatTime(i)} · {formatValue(value)}</title>
             </circle>
           ))}
@@ -291,7 +219,7 @@ function AppPage() {
         <div className="shell nav-inner">
           <Link className="brand" href="/" aria-label="O.A.S.I.S. home">
             <span className="brand-mark"><LogoMark /></span>
-            <span><span className="brand-word">O.A.S.I.S.</span><span className="brand-sub">ORBITAL CROP SYSTEMS</span></span>
+            <span><span className="brand-word">O.A.S.I.S.</span><span className="brand-sub">PLANT GROWTH SYSTEMS</span></span>
           </Link>
           <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
             <a href="/#mission" onClick={() => setMenuOpen(false)}>Mission</a>
@@ -313,20 +241,24 @@ function AppPage() {
         <section id="top" className="hero">
           <div className="shell hero-grid">
             <div className="hero-copy">
-              <div className="hero-overline"><span className="line" /><span className="eyebrow">Closed-loop cultivation · concept demonstrator</span></div>
-              <h1 className="display">Life support,<br /><span>rooted.</span></h1>
-              <p>O.A.S.I.S. explores a safer way to grow fresh food beyond Earth: sense the habitat, derive plant context, ask an AI model to propose, then let deterministic rules decide what may be applied.</p>
+              <div className="eyebrow">Closed-loop cultivation · concept demonstrator</div>
+              <h1 className="display">Grow the harvest<br />where <em>soil</em> is scarce.</h1>
+              <p>O.A.S.I.S. watches the root zone, the air and the light around potato and dwarf tomato plants, then lets an AI model propose care while plain, inspectable rules decide what is allowed.</p>
               <div className="hero-actions">
-                <Link className="action primary" href="/dashboard">Open dashboard <ArrowRight size={14} /></Link>
-                <a className="action" href="#architecture">How the loop works <ArrowDown size={13} /></a>
+                <Link className="action primary" href="/dashboard">Open plant dashboard <ArrowRight size={16} /></Link>
+                <a className="action" href="#architecture">How the loop works <ArrowDown size={15} /></a>
               </div>
-              <div className="hero-notes">
-                <span><b>01</b> SENSE THE ROOT ZONE</span><span><b>02</b> KEEP ACTUATION BOUNDED</span>
-              </div>
+              <ul className="hero-facts">
+                <li><b>2</b> crop profiles</li><li><b>8</b> synthetic frames</li><li><b>3</b> hard safeguards</li>
+              </ul>
             </div>
             <div className="hero-visual">
-              <HabitatIllustration />
-              <div className="visual-caption">ORBITAL GROWTH VOLUME<br />SYSTEM CONCEPT · NOT FLIGHT HARDWARE</div>
+              <figure className="hero-photo">
+                <img src="/images/nasa-veggie.jpg" alt="Astronaut tending plant pillows in the Veggie growth chamber under pink LED light" />
+                <figcaption>Photo: NASA, Veggie plant growth on the International Space Station</figcaption>
+              </figure>
+              <div className="hero-card"><CropPlant crop="potato" /><div><span>Primary crop</span><b>Potato</b><i>Solanum tuberosum</i></div></div>
+              <div className="hero-card hero-card-2"><CropPlant crop="tomato" /><div><span>Profile only</span><b>Dwarf tomato</b><i>No run data</i></div></div>
             </div>
           </div>
         </section>
@@ -334,17 +266,21 @@ function AppPage() {
         <section id="mission" className="section">
           <div className="shell mission-grid">
             <div className="mission-copy">
-              <div className="eyebrow">01 / Why O.A.S.I.S.</div>
-              <h2 className="display" style={{ fontSize: 'clamp(34px,4vw,48px)', lineHeight: 1.08, margin: '13px 0 18px' }}>Fresh food is a mission resource.</h2>
+              <div className="eyebrow">01 / Why plants</div>
+              <h2 className="display">Fresh food is a mission resource.</h2>
               <p>Long-duration crews need nutrition, variety and the everyday well-being that comes from tending living things. Yet a habitat has little spare water or power, a tightly coupled atmosphere, and no easy path to replace a crop that fails.</p>
               <p>O.A.S.I.S. is a closed-loop cultivation concept for making that growing environment legible and responsive. It links plant-relevant sensing to recommendations, while keeping actuator authority behind a small, inspectable rules layer.</p>
-              <blockquote className="mission-quote">“A useful AI in a life-support loop knows when it is not in charge.”</blockquote>
+              <blockquote className="mission-quote">A useful AI in a life-support loop knows when it is not in charge.</blockquote>
+              <figure className="side-photo">
+                <img src="/images/nasa-plant-experiment.png" alt="Astronaut working at a plant experiment station aboard the International Space Station" />
+                <figcaption>Photo: NASA, plant experiment work aboard the International Space Station</figcaption>
+              </figure>
             </div>
             <div className="challenge-list">
-              <article className="challenge"><span className="challenge-icon"><Droplets size={18} /></span><div><h3>Water is a system, not a tap</h3><p>Closed loops demand careful delivery. Too little stresses a crop; excess can saturate media and starve roots of oxygen.</p></div></article>
-              <article className="challenge"><span className="challenge-icon"><Waves size={18} /></span><div><h3>Atmosphere couples everything</h3><p>Humidity, temperature and CO₂ interact with transpiration and photosynthesis. A single threshold cannot describe the whole canopy.</p></div></article>
-              <article className="challenge"><span className="challenge-icon"><Bolt size={18} /></span><div><h3>Power and heat are mission constraints</h3><p>Light and fans are useful only within hardware limits. Thermal excursions need an explicit response path.</p></div></article>
-              <article className="challenge"><span className="challenge-icon"><Sprout size={18} /></span><div><h3>Crop failure has a long tail</h3><p>Plant condition affects food variety and crew routine. The aim is better visibility and bounded support—not a promise of autonomy.</p></div></article>
+              <article className="challenge c-water"><span className="challenge-icon"><Droplets size={22} /></span><div><h3>Water is a system, not a tap</h3><p>Closed loops demand careful delivery. Too little stresses a crop; excess can saturate media and starve roots of oxygen.</p></div></article>
+              <article className="challenge c-air"><span className="challenge-icon"><Waves size={22} /></span><div><h3>Atmosphere couples everything</h3><p>Humidity, temperature and CO₂ interact with transpiration and photosynthesis. A single threshold cannot describe the whole canopy.</p></div></article>
+              <article className="challenge c-power"><span className="challenge-icon"><Bolt size={22} /></span><div><h3>Power and heat are mission constraints</h3><p>Light and fans are useful only within hardware limits. Thermal excursions need an explicit response path.</p></div></article>
+              <article className="challenge c-crop"><span className="challenge-icon"><Sprout size={22} /></span><div><h3>Crop failure has a long tail</h3><p>Plant condition affects food variety and crew routine. The aim is better visibility and bounded support, not a promise of autonomy.</p></div></article>
             </div>
           </div>
         </section>
@@ -429,13 +365,14 @@ function AppPage() {
               </div>
               <div className="signal-grid">
                 {[
-                  { key: 'temperature', label: 'Air temperature', value: hasReplayData ? sample.air.toFixed(1) : '—', unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, outside: hasReplayData && profileChecks[0].outside },
-                  { key: 'moisture', label: 'Substrate moisture', value: hasReplayData ? sample.moisture.toFixed(1) : '—', unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, outside: hasReplayData && profileChecks[1].outside },
-                  { key: 'vpd', label: 'Vapor pressure deficit', value: hasReplayData ? vpd.toFixed(2) : '—', unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, outside: hasReplayData && profileChecks[2].outside },
+                  { key: 'temperature', min: 10, max: 32, raw: sample.air, label: 'Air temperature', value: hasReplayData ? sample.air.toFixed(1) : '—', unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, rng: activeProfile.air, outside: hasReplayData && profileChecks[0].outside },
+                  { key: 'moisture', min: 0, max: 60, raw: sample.moisture, label: 'Substrate moisture', value: hasReplayData ? sample.moisture.toFixed(1) : '—', unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, rng: activeProfile.moisture, outside: hasReplayData && profileChecks[1].outside },
+                  { key: 'vpd', min: 0, max: 2.2, raw: vpd, label: 'Vapor pressure deficit', value: hasReplayData ? vpd.toFixed(2) : '—', unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, rng: activeProfile.vpd, outside: hasReplayData && profileChecks[2].outside },
                 ].map((signal) => (
                   <article className={`signal-card signal-${signal.key}`} key={signal.key}>
                     <div className="signal-card-head"><span>{signal.label}</span><i aria-hidden="true" /></div>
                     <div className="signal-value">{signal.value}<small>{hasReplayData && signal.unit}</small></div>
+                    <div className="gauge" aria-hidden="true"><span className="gauge-band" style={{ left: `${(signal.rng[0] - signal.min) / (signal.max - signal.min) * 100}%`, width: `${(signal.rng[1] - signal.rng[0]) / (signal.max - signal.min) * 100}%` }} />{hasReplayData && <span className="gauge-dot" style={{ left: `${Math.min(100, Math.max(0, (signal.raw - signal.min) / (signal.max - signal.min) * 100))}%` }} />}</div>
                     <div className="signal-target">Profile range <b>{signal.target}</b></div>
                     <div className={`signal-state ${signal.outside ? 'outside' : ''}`}>{hasReplayData ? signal.outside ? 'Outside range' : 'Within range' : 'No reading recorded'}</div>
                   </article>
@@ -551,7 +488,7 @@ function AppPage() {
                 );
               })}
             </div>
-            <div className="surface expansion-note"><FlaskConical size={16} color="#62d8ed" /><span><strong>Future crop expansion:</strong> radish, microgreens and lettuce are ideas only—not configured profiles, with no targets asserted here.</span></div>
+            <div className="surface expansion-note"><FlaskConical size={18} /><span><strong>Future crop expansion:</strong> radish, microgreens and lettuce are ideas only—not configured profiles, with no targets asserted here.</span></div>
           </div>
         </section>
 
@@ -597,16 +534,15 @@ function AppPage() {
                ) : (
                  <>
                    <div className="model-status">Prototype model pending</div>
-                   <svg className="pending-model" viewBox="0 0 500 330" role="img" aria-label="Wireframe placeholder showing a pending habitat CAD model">
-                     <g fill="none" stroke="#62a3a7" strokeWidth="1.5">
-                       <path d="M123 86 252 36l126 49v163l-126 56-129-54Z" />
-                       <path d="m123 86 129 54 126-55M252 140v164M123 86l129-50 126 49" />
-                       <path d="M157 101v135l94 40V141m-63-29 64 29m0 0 93-37v133l-94 42" strokeDasharray="5 6" />
-                       <path d="M93 75h30M378 86h42M105 250h18M378 240h36M252 20V8m0 300v14" />
-                     </g>
-                     <g fill="#54e1a9"><circle cx="123" cy="86" r="3"/><circle cx="252" cy="36" r="3"/><circle cx="378" cy="85" r="3"/></g>
-                   </svg>
-                   <span className="visual-caption">WIRE-FRAME SLOT · NO CAD MODEL LOADED</span>
+                   <svg className="pending-model" viewBox="0 0 500 330" role="img" aria-label="Outline placeholder showing a pending habitat CAD model">
+                      <g fill="none" stroke="#5b8a52" strokeWidth="2" strokeLinejoin="round">
+                        <path d="M123 86 252 36l126 49v163l-126 56-129-54Z" />
+                        <path d="m123 86 129 54 126-55M252 140v164" />
+                        <path d="M157 101v135l94 40V141m-63-29 64 29m0 0 93-37v133l-94 42" strokeDasharray="5 6" />
+                      </g>
+                      <g fill="#d4452f"><circle cx="123" cy="86" r="4" /><circle cx="252" cy="36" r="4" /><circle cx="378" cy="85" r="4" /></g>
+                    </svg>
+                    <span className="slot-caption">Outline slot · no CAD model loaded</span>
                  </>
                )}
               </div>
