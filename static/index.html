@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O.A.S.I.S. | Orbital Adaptive Smart Irrigation & Sustenance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-space: #07090e;
+      --card-bg: rgba(16, 22, 34, 0.75);
+      --card-border: rgba(56, 189, 248, 0.15);
+      --cyan-glow: #38bdf8;
+      --emerald-target: #10b981;
+      --amber-alert: #f59e0b;
+      --rose-danger: #f43f5e;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font-ui: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-space);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 45%);
+      color: var(--text-main);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(10, 15, 26, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 1.25rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .badge-orb {
+      width: 14px;
+      height: 14px;
+      background: var(--emerald-target);
+      border-radius: 50%;
+      box-shadow: 0 0 16px var(--emerald-target);
+      animation: pulse 2.2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.25); opacity: 1; }
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: linear-gradient(135deg, #fff 30%, var(--cyan-glow) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .status-capsule {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    main {
+      flex: 1;
+      padding: 2rem 2.5rem;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem 2rem;
+      backdrop-filter: blur(16px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .crop-selector-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    select, button {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--text-main);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    select:hover, button:hover {
+      border-color: var(--cyan-glow);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      border: none;
+      font-weight: 600;
+    }
+
+    /* Grid layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .telemetry-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .telemetry-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .card-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-value {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 700;
+    }
+
+    .card-meta {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      color: var(--emerald-target);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .card-meta.alert {
+      color: var(--rose-danger);
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .actuator-panel {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+      .actuator-panel {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .data-table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+
+    th, td {
+      padding: 1rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    tr:hover td {
+      background: rgba(56, 189, 248, 0.03);
+    }
+
+    .badge-diff {
+      color: var(--rose-danger);
+      font-weight: 700;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .pill-nominal {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald-target);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .pill-alert {
+      background: rgba(244, 63, 94, 0.15);
+      color: var(--rose-danger);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+    }
+
+    .reasoning-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .reasoning-header {
+      display: flex;
+      justify-content: space-between;
+      color: var(--cyan-glow);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 1.5rem 2.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="badge-orb"></div>
+      <div>
+        <div class="brand-title">O.A.S.I.S. MISSION CONTROL</div>
+        <div class="brand-sub">Orbital Adaptive Smart Irrigation & Sustenance // Habitats Bio-Dome 04</div>
+      </div>
+    </div>
+    <div class="status-capsule">
+      <div class="status-item">
+        <span>MODEL:</span>
+        <strong style="color: var(--cyan-glow);">openai/gpt-oss-120b</strong>
+      </div>
+      <div class="status-item">
+        <span>SAFETY GUARD:</span>
+        <strong style="color: var(--emerald-target);">ACTIVE (DETERMINISTIC)</strong>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-banner">
+      <div>
+        <h2 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.4rem;">Martian Bio-Dome Hydroponic Array</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Closed-loop telemetry intake, Vapor Pressure Deficit (VPD) computation, and LLM-assisted biophysical actuation.
+        </p>
+      </div>
+      <div class="crop-selector-group">
+        <label for="cropSelect" style="font-size: 0.85rem; color: var(--text-muted);">Active Crop:</label>
+        <select id="cropSelect">
+          <option value="potato" selected>Solanum tuberosum (Martian Regolith)</option>
+          <option value="dwarf_tomato">Solanum lycopersicum (Hydroponic Loop)</option>
+        </select>
+        <button class="primary" id="btnRun">Run Telemetry Stream</button>
+      </div>
+    </div>
+
+    <!-- Telemetry Cards -->
+    <div class="dashboard-grid">
+      <div class="telemetry-card">
+        <div class="card-label">
+          <span>VPD (Vapor Pressure Deficit)</span>
+          <span>Target: 0.8 - 1.2 kPa</span>
+        </div>
+        <div class="card-value" id="valVpd">0.846 kPa</div>
+        <div class="card-meta" id="metaVpd">● Within Optimal Transpiration Zone</div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="card-label">
+          <span>Air Temperature</span>
+          <span>Target: 18 - 22 °C</span>
+        </div>
+        <div class="card-value" id="valTemp">20.1 °C</div>
+        <div class="card-meta">● Nominal Cabin Thermal Band</div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="card-label">
+          <span>Relative Humidity</span>
+          <span>Ambient RH%</span>
+        </div>
+        <div class="card-value" id="valRh">64.0 %</div>
+        <div class="card-meta">● Stable Atmospheric Moisture</div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="card-label">
+          <span>Substrate Moisture</span>
+          <span>Target: 35 - 45 %</span>
+        </div>
+        <div class="card-value" id="valSoil">40.2 %</div>
+        <div class="card-meta">● Regolith Hydration Optimal</div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="card-label">
+          <span>LED Array Temperature</span>
+          <span>Limit: < 60.0 °C</span>
+        </div>
+        <div class="card-value" id="valLed">38.0 °C</div>
+        <div class="card-meta">● Thermal Margin: +22.0 °C</div>
+      </div>
+
+      <div class="telemetry-card">
+        <div class="card-label">
+          <span>Water Reservoir</span>
+          <span>Floor: > 5.0 %</span>
+        </div>
+        <div class="card-value" id="valRes">80.0 %</div>
+        <div class="card-meta">● Dry-Pump Protection Safe</div>
+      </div>
+    </div>
+
+    <!-- Actuation & Reasoning Panels -->
+    <div class="actuator-panel">
+      <div class="data-table-container">
+        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--card-border); font-weight: 600;">
+          Telemetry Timeline & Clamped Actuations (Proposed vs. Applied)
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>VPD</th>
+              <th>Soil %</th>
+              <th>LED Temp</th>
+              <th>Reservoir</th>
+              <th>Irrigation</th>
+              <th>Light %</th>
+              <th>Fan %</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="telemetryTableBody">
+            <tr>
+              <td>00:00</td>
+              <td>0.846</td>
+              <td>40.2</td>
+              <td>38.0</td>
+              <td>80.0%</td>
+              <td>45 ml</td>
+              <td>80%</td>
+              <td>60%</td>
+              <td><span class="badge-pill pill-nominal">Nominal</span></td>
+            </tr>
+            <tr>
+              <td>00:15</td>
+              <td>1.076</td>
+              <td>35.0</td>
+              <td>42.0</td>
+              <td>78.0%</td>
+              <td>50 ml</td>
+              <td>80%</td>
+              <td>60%</td>
+              <td><span class="badge-pill pill-nominal">Nominal</span></td>
+            </tr>
+            <tr>
+              <td>00:30</td>
+              <td>1.815</td>
+              <td>18.4</td>
+              <td>52.0</td>
+              <td>75.0%</td>
+              <td>110 ml</td>
+              <td>70%</td>
+              <td>85%</td>
+              <td><span class="badge-pill pill-nominal">Nominal</span></td>
+            </tr>
+            <tr>
+              <td>00:45</td>
+              <td>2.109</td>
+              <td>15.0</td>
+              <td>63.5</td>
+              <td>72.0%</td>
+              <td>120 ml</td>
+              <td><span class="badge-diff">75 → 15%</span></td>
+              <td>90%</td>
+              <td><span class="badge-pill pill-alert">LED Overtemp</span></td>
+            </tr>
+            <tr>
+              <td>01:00</td>
+              <td>0.945</td>
+              <td>38.0</td>
+              <td>39.0</td>
+              <td>70.0%</td>
+              <td>45 ml</td>
+              <td>80%</td>
+              <td>60%</td>
+              <td><span class="badge-pill pill-nominal">Nominal</span></td>
+            </tr>
+            <tr>
+              <td>01:15</td>
+              <td>0.843</td>
+              <td>41.0</td>
+              <td>37.5</td>
+              <td>68.0%</td>
+              <td>40 ml</td>
+              <td>80%</td>
+              <td>55%</td>
+              <td><span class="badge-pill pill-nominal">Nominal</span></td>
+            </tr>
+            <tr>
+              <td>01:30</td>
+              <td>1.460</td>
+              <td>28.0</td>
+              <td>58.0</td>
+              <td>65.0%</td>
+              <td>85 ml</td>
+              <td>75%</td>
+              <td>75%</td>
+              <td><span class="badge-pill pill-nominal">Nominal</span></td>
+            </tr>
+            <tr>
+              <td>01:45</td>
+              <td>1.956</td>
+              <td>16.0</td>
+              <td>64.0</td>
+              <td>3.5%</td>
+              <td><span class="badge-diff">130 → 0 ml</span></td>
+              <td><span class="badge-diff">80 → 15%</span></td>
+              <td>95%</td>
+              <td><span class="badge-pill pill-alert">Dual Clamp</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="reasoning-box">
+        <div class="reasoning-header">
+          <span>LATEST CONTROLLER REASONING</span>
+          <span>FRAME 8 (01:45)</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem;">
+          "Substrate moisture has depleted to 16.0% and ambient VPD is elevated at 1.956 kPa. Requested high irrigation volume (130 ml) and high cooling fan duty (95%).
+          However, reservoir level dropped to critical 3.5% (dry-pump floor 5.0%) and LED arrays reached 64.0°C (limit 60°C).
+          Deterministic safety supervisor intervened: light intensity capped to 15%, pump disabled to 0 ml."
+        </p>
+        <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--card-border);">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--rose-danger); font-weight: 700;">
+            Triggered Rules:
+          </div>
+          <div style="font-size: 0.8rem; font-family: var(--font-mono); margin-top: 0.25rem;">
+            [1] dry_reservoir (pump disabled)<br>
+            [2] led_overtemp (intensity capped at 15%)
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    O.A.S.I.S. Mission Architecture · Automated Closed-Loop Habitats Control · Powered by Groq LLM & Deterministic Safety Enforcement
+  </footer>
+
+  <script>
+    document.getElementById('btnRun').addEventListener('click', () => {
+      alert("Telemetry stream simulated! For full CLI execution with real-time plots and Groq API calls, run: 'python main.py'");
+    });
+  </script>
+</body>
+</html>

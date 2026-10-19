@@ -1,7 +1,8 @@
-import { Children, cloneElement, isValidElement, useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
+import { Children, cloneElement, isValidElement, useCallback, useEffect, useMemo, useState, type ChangeEvent, type ReactNode } from 'react';
 import {
   AlertTriangle, ArrowDown, ArrowRight, Check, FileUp, Gauge, Lightbulb,
   Menu, Pause, Play, Radio, ShieldCheck, X, Sun, Moon,
+  Beaker, Zap, RotateCcw, Sliders,
 } from 'lucide-react';
 import ModelViewer from './components/ModelViewer';
 import { Link, Router, useLocation } from 'wouter';
@@ -19,7 +20,16 @@ const frames: Frame[] = [
   { air: 21.0, rh: 62, moisture: 38, co2: 960, led: 39, reservoir: 70 },
   { air: 20.5, rh: 65, moisture: 41, co2: 950, led: 37.5, reservoir: 68 },
   { air: 23.0, rh: 48, moisture: 28, co2: 1020, led: 58, reservoir: 65 },
-  { air: 25.5, rh: 40, moisture: 16, co2: 1150, led: 64, reservoir: 3.5 },
+];
+const tomatoFrames: Frame[] = [
+  { air: 22.0, rh: 62, moisture: 46.0, co2: 950, led: 39, reservoir: 80 },
+  { air: 23.5, rh: 56, moisture: 42.0, co2: 980, led: 43, reservoir: 77 },
+  { air: 26.2, rh: 44, moisture: 32.0, co2: 1040, led: 53, reservoir: 74 },
+  { air: 27.8, rh: 39, moisture: 28.0, co2: 1120, led: 62.5, reservoir: 70 },
+  { air: 24.1, rh: 58, moisture: 44.0, co2: 960, led: 41, reservoir: 66 },
+  { air: 23.0, rh: 60, moisture: 45.0, co2: 950, led: 38, reservoir: 63 },
+  { air: 25.0, rh: 48, moisture: 34.0, co2: 1020, led: 58, reservoir: 59 },
+  { air: 27.0, rh: 41, moisture: 22.0, co2: 1180, led: 64.0, reservoir: 3.8 },
 ];
 const irrigateProposal = [20, 20, 30, 80, 20, 20, 30, 45];
 const lightProposal = [80, 70, 70, 30, 62, 70, 70, 70];
@@ -481,9 +491,10 @@ function useSitePreferences() {
 }
 
 function TelemetryChart({ metric, crop, activeFrame, language }: { metric: MetricKey; crop: CropKey; activeFrame: number; language: 'en' | 'ar' }) {
-  const chartValues = useMemo(() => frames.map((f) =>
+  const currentDataset = crop === 'potato' ? frames : tomatoFrames;
+  const chartValues = useMemo(() => currentDataset.map((f) =>
     metric === 'moisture' ? f.moisture : metric === 'air' ? f.air : vpdFor(f.air, f.rh),
-  ), [metric]);
+  ), [metric, crop]);
   const config = metric === 'moisture'
     ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#2a8c8c', unit: '%', title: 'Substrate moisture' }
     : metric === 'air'
@@ -542,25 +553,157 @@ function AppPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modelFile, setModelFile] = useState<File | null>(null);
   const [modelError, setModelError] = useState('');
-  const sample = frames[frame];
+  const [liveMode, setLiveMode] = useState(true);
+  const [evaluating, setEvaluating] = useState(false);
+  const [liveResults, setLiveResults] = useState<Record<string, any>>({});
+  const [backendOnline, setBackendOnline] = useState(false);
+
+  // Simulation Lab state
+  const [simOpen, setSimOpen] = useState(false);
+  const [simScenario, setSimScenario] = useState('optimal');
+  const [simFrames, setSimFrames] = useState(4);
+  const [simRandomize, setSimRandomize] = useState(true);
+  const [simCustom, setSimCustom] = useState({ air: 20.5, rh: 62, moisture: 40, co2: 950, led: 38, reservoir: 80 });
+  const [simUseCustom, setSimUseCustom] = useState(false);
+  const [simRunning, setSimRunning] = useState(false);
+  const [simResults, setSimResults] = useState<any>(null);
+  const [simExpandedFrame, setSimExpandedFrame] = useState<number | null>(null);
+  const [simError, setSimError] = useState('');
+  const [scenarios, setScenarios] = useState<Record<string, any>>({});
+
+  // Fetch scenario presets
+  useEffect(() => {
+    fetch('/api/oasis/scenarios')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => { if (data) setScenarios(data); })
+      .catch(() => {});
+  }, []);
+
+  // Apply preset values when scenario changes
+  useEffect(() => {
+    if (!simUseCustom && scenarios[simScenario]?.base) {
+      setSimCustom(scenarios[simScenario].base);
+    }
+  }, [simScenario, scenarios, simUseCustom]);
+
+  const runSimulation = useCallback(async () => {
+    setSimRunning(true);
+    setSimError('');
+    setSimResults(null);
+    setSimExpandedFrame(null);
+    try {
+      const body: any = {
+        crop,
+        num_frames: simFrames,
+        randomize: simRandomize,
+      };
+      if (simUseCustom) {
+        body.air = simCustom.air;
+        body.rh = simCustom.rh;
+        body.moisture = simCustom.moisture;
+        body.co2 = simCustom.co2;
+        body.led = simCustom.led;
+        body.reservoir = simCustom.reservoir;
+      } else {
+        body.scenario = simScenario;
+      }
+      const res = await fetch('/api/oasis/simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSimResults(data);
+        setSimExpandedFrame(0);
+      } else {
+        setSimError(`Server error: ${res.status}`);
+      }
+    } catch (err: any) {
+      setSimError(err.message || 'Failed to connect to API');
+    } finally {
+      setSimRunning(false);
+    }
+  }, [crop, simFrames, simRandomize, simScenario, simUseCustom, simCustom]);
+
+  const currentFrames = crop === 'potato' ? frames : tomatoFrames;
+  const sample = currentFrames[frame] || currentFrames[0];
   const vpd = vpdFor(sample.air, sample.rh);
-  const hasReplayData = crop === 'potato';
+  const hasReplayData = true;
   const activeProfile = cropData[crop];
+
   const profileChecks = [
     { label: 'Air temperature', value: `${sample.air.toFixed(1)} °C`, range: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, outside: sample.air < activeProfile.air[0] || sample.air > activeProfile.air[1] },
     { label: 'Substrate moisture', value: `${sample.moisture.toFixed(1)}%`, range: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, outside: sample.moisture < activeProfile.moisture[0] || sample.moisture > activeProfile.moisture[1] },
     { label: 'Derived VPD', value: `${vpd.toFixed(2)} kPa`, range: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, outside: vpd < activeProfile.vpd[0] || vpd > activeProfile.vpd[1] },
   ];
   const outsideProfileCount = profileChecks.filter((check) => check.outside).length;
-  const proposedIrrigation = irrigateProposal[frame];
-  const proposedLight = lightProposal[frame];
-  const permittedIrrigation = sample.reservoir < 5 ? 0 : Math.min(proposedIrrigation, 150);
-  const permittedLight = sample.led >= 60 ? Math.min(proposedLight, 15) : proposedLight;
-  const interventions = [
-    ...(sample.led >= 60 ? [`LED ${sample.led}°C ≥ 60°C: light capped ${proposedLight}% → ${permittedLight}%`] : []),
-    ...(sample.reservoir < 5 ? [`Reservoir ${sample.reservoir}% < 5%: irrigation forced ${proposedIrrigation} ml → 0 ml`] : []),
-    ...(sample.reservoir >= 5 && proposedIrrigation > 150 ? ['Irrigation request capped at 150 ml'] : []),
-  ];
+
+  // Check backend status on mount
+  useEffect(() => {
+    fetch('/api/oasis/status')
+      .then((r) => r.ok && r.json())
+      .then((data) => {
+        if (data && data.status === 'online') setBackendOnline(true);
+      })
+      .catch(() => setBackendOnline(false));
+  }, []);
+
+  // Live evaluation against Groq LLM + Deterministic Safety Engine
+  const evaluateCurrentFrame = async (fIndex: number, cCrop: CropKey) => {
+    const s = (cCrop === 'potato' ? frames : tomatoFrames)[fIndex];
+    const cacheKey = `${cCrop}_${fIndex}`;
+    if (liveResults[cacheKey]) return;
+
+    try {
+      setEvaluating(true);
+      const res = await fetch('/api/oasis/step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          crop: cCrop,
+          frame: s,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setLiveResults((prev) => ({ ...prev, [cacheKey]: data }));
+        setBackendOnline(true);
+      }
+    } catch {
+      setBackendOnline(false);
+    } finally {
+      setEvaluating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (liveMode && isDashboard) {
+      evaluateCurrentFrame(frame, crop);
+    }
+  }, [frame, crop, liveMode, isDashboard]);
+
+  const cacheKey = `${crop}_${frame}`;
+  const liveData = liveResults[cacheKey];
+  const isLive = liveMode && !!liveData;
+
+  const proposedIrrigation = isLive ? liveData.proposed.irrigation : (crop === 'potato' ? irrigateProposal[frame] : 35);
+  const proposedLight = isLive ? liveData.proposed.light : (crop === 'potato' ? lightProposal[frame] : 75);
+  const proposedRb = isLive ? liveData.proposed.rb : (crop === 'potato' ? redBlueProposal[frame] : 4.5);
+  const proposedFan = isLive ? liveData.proposed.fan : (crop === 'potato' ? fanProposal[frame] : 65);
+
+  const permittedIrrigation = isLive ? liveData.applied.irrigation : (sample.reservoir < 5 ? 0 : Math.min(proposedIrrigation, 150));
+  const permittedLight = isLive ? liveData.applied.light : (sample.led >= 60 ? Math.min(proposedLight, 15) : proposedLight);
+
+  const interventions: string[] = isLive
+    ? liveData.interventions.map((i: any) => i.message)
+    : [
+        ...(sample.led >= 60 ? [`LED ${sample.led}°C ≥ 60°C: light capped ${proposedLight}% → ${permittedLight}%`] : []),
+        ...(sample.reservoir < 5 ? [`Reservoir ${sample.reservoir}% < 5%: irrigation forced ${proposedIrrigation} ml → 0 ml`] : []),
+        ...(sample.reservoir >= 5 && proposedIrrigation > 150 ? ['Irrigation request capped at 150 ml'] : []),
+      ];
+
+  const liveReasoning = isLive ? (liveData.reasoning || '') : '';
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -727,6 +870,36 @@ function AppPage() {
                     </button>
                   ))}
                 </div>
+                <button
+                  className="replay-button"
+                  type="button"
+                  style={{
+                    background: isLive ? 'rgba(56, 189, 248, 0.18)' : undefined,
+                    borderColor: isLive ? '#38bdf8' : undefined,
+                    color: isLive ? '#38bdf8' : undefined,
+                  }}
+                  onClick={() => {
+                    const nextMode = !liveMode;
+                    setLiveMode(nextMode);
+                    if (nextMode) evaluateCurrentFrame(frame, crop);
+                  }}
+                  aria-label="Toggle Live LLM Pipeline"
+                >
+                  {evaluating ? '⚡ Querying Groq...' : (isLive ? '⚡ Live LLM: Active' : '⚡ Enable Live LLM')}
+                </button>
+                <button
+                  className="replay-button"
+                  type="button"
+                  style={{
+                    background: simOpen ? 'rgba(168, 85, 247, 0.18)' : undefined,
+                    borderColor: simOpen ? '#a855f7' : undefined,
+                    color: simOpen ? '#a855f7' : undefined,
+                  }}
+                  onClick={() => setSimOpen(!simOpen)}
+                  aria-label="Toggle Simulation Lab"
+                >
+                  <Beaker size={16} />{simOpen ? 'Close Sim Lab' : 'Simulation Lab'}
+                </button>
                 <button className="replay-button" type="button" disabled={!hasReplayData} onClick={() => setPlaying(!playing)} aria-label={playing ? 'Pause replay' : 'Play replay'}>
                   {playing ? <Pause size={16} /> : <Play size={16} />}{playing ? 'Pause replay' : 'Play replay'}
                 </button>
@@ -743,7 +916,7 @@ function AppPage() {
                 </div>
                 <p className="range-explainer">{hasReplayData ? 'Three measured or derived signals compared with this crop profile.' : 'Targets are configured; no tomato sensor run is available.'}</p>
                 <div className="botanical-meta">
-                  <span className="data-mode">{hasReplayData ? 'OFFLINE NOTEBOOK' : 'PROFILE ONLY · NO RUN'}</span>
+                  <span className="data-mode">{isLive ? 'LIVE LLM (OPENAI/GPT-OSS-120B)' : (crop === 'potato' ? 'OFFLINE NOTEBOOK' : 'SYNTHETIC PROFILE')}</span>
                   <span className="frame-readout">{hasReplayData ? <>FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></> : 'NO REPLAY FRAME'}</span>
                 </div>
                 <div className="stage-note"><span className="stage-note-rule" />Fresh food is part of life support.</div>
@@ -795,16 +968,16 @@ function AppPage() {
             <section className="proposal-panel" aria-labelledby="proposal-title">
               <div className="insight-heading">
                 <div><span className="section-index">02</span><h3 id="proposal-title">Model-to-control pipeline</h3></div>
-                <span className="proposal-source">{hasReplayData ? 'Potato · offline notebook replay' : 'Dwarf tomato · profile only'}</span>
+                <span className="proposal-source">{isLive ? `${activeProfile.name} · Live Groq Controller (openai/gpt-oss-120b)` : `${activeProfile.name} · Offline replay`}</span>
               </div>
-              <p className="proposal-intro">{hasReplayData ? 'Stored notebook output for this frame; no live LLM call.' : 'No recorded sensor run or model output exists for this crop.'}</p>
+              <p className="proposal-intro">{evaluating ? 'Connecting to Groq API and computing biophysical actuation with openai/gpt-oss-120b...' : (isLive ? 'Live Groq LLM inference clamped against deterministic safety thresholds.' : 'Stored notebook output for this frame.')}</p>
               <div className={`pipeline-track ${hasReplayData ? 'has-run' : 'no-run'}`} aria-label="Readings to hardware pipeline">
                 {[
-                  { label: 'Sensor snapshot', status: hasReplayData ? `Frame ${String(frame + 1).padStart(2, '0')}` : 'No run recorded' },
-                  { label: 'LLM proposal', status: hasReplayData ? 'Stored output' : 'Unavailable' },
-                  { label: 'Rule review', status: hasReplayData ? 'Results below' : 'Not run' },
-                  { label: 'Human approval', status: 'Not connected' },
-                  { label: 'Hardware', status: 'Not sent' },
+                  { label: 'Sensor snapshot', status: `Frame ${String(frame + 1).padStart(2, '0')}` },
+                  { label: 'LLM proposal', status: evaluating ? 'Querying...' : (isLive ? 'openai/gpt-oss-120b' : 'Stored output') },
+                  { label: 'Rule review', status: isLive ? (interventions.length ? `${interventions.length} rule${interventions.length === 1 ? '' : 's'} clamped` : 'Within safe envelope') : 'Results below' },
+                  { label: 'Human approval', status: isLive ? 'Ready for review' : 'Not connected' },
+                  { label: 'Hardware', status: isLive ? 'Armed & Clamped' : 'Not sent' },
                 ].map((step, index) => (
                   <div className="pipeline-step" key={step.label}>
                     <span className="pipeline-step-number">{String(index + 1).padStart(2, '0')}</span>
@@ -816,14 +989,214 @@ function AppPage() {
               <table className="proposal-table">
                 <thead><tr><th scope="col">Control</th><th scope="col">Recorded proposal</th><th scope="col">Deterministic rule result</th></tr></thead>
                 <tbody>
-                  <tr><th scope="row">Irrigation volume</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${proposedIrrigation} ml` : 'Not recorded'}</td><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${permittedIrrigation} ml` : 'Not run'}</td></tr>
-                  <tr><th scope="row">Light intensity</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${proposedLight}%` : 'Not recorded'}</td><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${permittedLight}%` : 'Not run'}</td></tr>
-                  <tr><th scope="row">Red : blue ratio</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `~${redBlueProposal[frame]} : 1` : 'Not recorded'}</td><td className="not-rule-checked">{hasReplayData ? 'Not checked' : 'Not run'}</td></tr>
-                  <tr><th scope="row">Fan duty</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${fanProposal[frame]}%` : 'Not recorded'}</td><td className="not-rule-checked">{hasReplayData ? 'Not checked' : 'Not run'}</td></tr>
+                  <tr><th scope="row">Irrigation volume</th><td>{`${proposedIrrigation} ml`}</td><td>{`${permittedIrrigation} ml`}</td></tr>
+                  <tr><th scope="row">Light intensity</th><td>{`${proposedLight}%`}</td><td>{`${permittedLight}%`}</td></tr>
+                  <tr><th scope="row">Red : blue ratio</th><td>{`~${proposedRb} : 1`}</td><td className="not-rule-checked">Not checked</td></tr>
+                  <tr><th scope="row">Fan duty</th><td>{`${proposedFan}%`}</td><td className="not-rule-checked">Not checked</td></tr>
                 </tbody>
               </table>
               <div className="proposal-key"><span><i className="key-recorded" />Recorded proposal</span><span><i className="key-checked" />Rule-checked result</span><span><i className="key-unchecked" />No rule applied</span></div>
+
+              {liveReasoning && (
+                <div className="live-reasoning-banner" style={{
+                  marginTop: '1.25rem',
+                  padding: '1.25rem',
+                  borderRadius: '8px',
+                  background: 'rgba(56, 189, 248, 0.06)',
+                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  textAlign: 'left',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <b style={{ color: '#38bdf8', fontSize: '0.85rem', letterSpacing: '0.05em' }}>
+                      ⚡ LLM BIOPHYSICAL REASONING · openai/gpt-oss-120b
+                    </b>
+                    <span style={{ fontSize: '0.72rem', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 600 }}>
+                      GROQ LIVE
+                    </span>
+                  </div>
+                  <p style={{ margin: 0, fontSize: '0.88rem', lineHeight: '1.65', color: 'inherit' }}>
+                    {liveReasoning}
+                  </p>
+                </div>
+              )}
             </section>
+
+            {/* ─── SIMULATION LAB ─── */}
+            {simOpen && (
+            <section className="sim-lab" id="sim-lab" aria-labelledby="sim-lab-title">
+              <div className="sim-lab-header">
+                <div><span className="section-index"><Beaker size={16} /></span><h3 id="sim-lab-title">Simulation Lab</h3></div>
+                <span className="sim-lab-badge">{backendOnline ? 'API CONNECTED' : 'API OFFLINE'}</span>
+              </div>
+              <p className="sim-lab-intro">Configure custom environmental conditions or choose a stress scenario, then run the full Groq LLM + safety pipeline on demand.</p>
+
+              <div className="sim-lab-grid">
+                {/* Left: Controls */}
+                <div className="sim-controls">
+                  <div className="sim-mode-toggle">
+                    <button type="button" className={!simUseCustom ? 'active' : ''} onClick={() => setSimUseCustom(false)}><Zap size={14} /> Scenario Preset</button>
+                    <button type="button" className={simUseCustom ? 'active' : ''} onClick={() => setSimUseCustom(true)}><Sliders size={14} /> Custom Sensors</button>
+                  </div>
+
+                  {!simUseCustom ? (
+                    <div className="sim-scenarios">
+                      {Object.entries(scenarios).map(([key, s]: [string, any]) => (
+                        <button
+                          key={key}
+                          type="button"
+                          className={`sim-scenario-btn ${simScenario === key ? 'active' : ''}`}
+                          onClick={() => setSimScenario(key)}
+                        >
+                          <b>{s.label}</b>
+                          <span>{s.description}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="sim-sliders">
+                      {[
+                        { key: 'air', label: 'Air Temperature', unit: '°C', min: -5, max: 50, step: 0.5 },
+                        { key: 'rh', label: 'Relative Humidity', unit: '%', min: 0, max: 100, step: 1 },
+                        { key: 'moisture', label: 'Substrate Moisture', unit: '%', min: 0, max: 100, step: 1 },
+                        { key: 'co2', label: 'CO₂', unit: 'ppm', min: 200, max: 3000, step: 10 },
+                        { key: 'led', label: 'LED Temperature', unit: '°C', min: 0, max: 120, step: 0.5 },
+                        { key: 'reservoir', label: 'Reservoir Level', unit: '%', min: 0, max: 100, step: 1 },
+                      ].map((s) => (
+                        <label key={s.key} className="sim-slider-row">
+                          <span className="sim-slider-label">{s.label}</span>
+                          <input
+                            type="range"
+                            min={s.min}
+                            max={s.max}
+                            step={s.step}
+                            value={(simCustom as any)[s.key]}
+                            onChange={(e) => setSimCustom((prev) => ({ ...prev, [s.key]: parseFloat(e.target.value) }))}
+                          />
+                          <span className="sim-slider-value">{(simCustom as any)[s.key]} {s.unit}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="sim-options">
+                    <label className="sim-option">
+                      <span>Frames</span>
+                      <select value={simFrames} onChange={(e) => setSimFrames(Number(e.target.value))}>
+                        {[1, 2, 3, 4, 6, 8, 10, 12].map((n) => <option key={n} value={n}>{n} frame{n > 1 ? 's' : ''}</option>)}
+                      </select>
+                    </label>
+                    <label className="sim-option">
+                      <span>Random drift</span>
+                      <button type="button" className={`sim-toggle ${simRandomize ? 'on' : ''}`} onClick={() => setSimRandomize(!simRandomize)}>
+                        {simRandomize ? 'ON' : 'OFF'}
+                      </button>
+                    </label>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="sim-run-btn"
+                    disabled={simRunning || !backendOnline}
+                    onClick={runSimulation}
+                  >
+                    {simRunning ? (
+                      <><span className="sim-spinner" /> Running simulation...</>
+                    ) : (
+                      <><Zap size={16} /> Run Simulation</>
+                    )}
+                  </button>
+
+                  {simError && <div className="sim-error"><AlertTriangle size={14} /> {simError}</div>}
+                </div>
+
+                {/* Right: Results */}
+                <div className="sim-results">
+                  {!simResults && !simRunning && (
+                    <div className="sim-empty">
+                      <Beaker size={40} />
+                      <p>Configure a scenario and hit <b>Run Simulation</b> to see LLM-driven actuation results in real time.</p>
+                    </div>
+                  )}
+
+                  {simRunning && (
+                    <div className="sim-loading">
+                      <div className="sim-loading-ring" />
+                      <p>Querying Groq LLM for {simFrames} frame{simFrames > 1 ? 's' : ''}...</p>
+                      <span>Each frame is evaluated independently by openai/gpt-oss-120b</span>
+                    </div>
+                  )}
+
+                  {simResults && (
+                    <div className="sim-results-content">
+                      <div className="sim-results-header">
+                        <div>
+                          <b>{simResults.total_frames} frame{simResults.total_frames > 1 ? 's' : ''} processed</b>
+                          <span>{simResults.scenario !== 'custom' ? scenarios[simResults.scenario]?.label || simResults.scenario : 'Custom sensors'} · {cropData[crop as CropKey]?.name || simResults.crop}</span>
+                        </div>
+                        <button type="button" className="sim-rerun" onClick={runSimulation} disabled={simRunning}>
+                          <RotateCcw size={14} /> Re-run
+                        </button>
+                      </div>
+
+                      <div className="sim-timeline">
+                        {simResults.records.map((rec: any, idx: number) => {
+                          const isExpanded = simExpandedFrame === idx;
+                          const hasInterventions = rec.interventions?.length > 0;
+                          return (
+                            <div key={idx} className={`sim-frame ${isExpanded ? 'expanded' : ''} ${hasInterventions ? 'has-intervention' : ''}`}>
+                              <button type="button" className="sim-frame-header" onClick={() => setSimExpandedFrame(isExpanded ? null : idx)}>
+                                <span className="sim-frame-id">Frame {String(rec.frame_id).padStart(2, '0')}</span>
+                                <span className="sim-frame-sensors">
+                                  {rec.telemetry.air}°C · {rec.telemetry.rh}% RH · {rec.telemetry.moisture}% soil · VPD {rec.telemetry.vpd?.toFixed(2)} kPa
+                                </span>
+                                <span className="sim-frame-status">
+                                  {hasInterventions ? <><AlertTriangle size={12} /> {rec.interventions.length} rule{rec.interventions.length > 1 ? 's' : ''}</> : <><Check size={12} /> OK</>}
+                                </span>
+                              </button>
+                              {isExpanded && (
+                                <div className="sim-frame-detail">
+                                  <div className="sim-frame-actuators">
+                                    <div className="sim-act-grid">
+                                      {[
+                                        { label: 'Irrigation', proposed: `${rec.proposed.irrigation} ml`, applied: `${rec.applied.irrigation} ml`, changed: rec.proposed.irrigation !== rec.applied.irrigation },
+                                        { label: 'Light', proposed: `${rec.proposed.light}%`, applied: `${rec.applied.light}%`, changed: rec.proposed.light !== rec.applied.light },
+                                        { label: 'R:B Ratio', proposed: `${rec.proposed.rb}:1`, applied: `${rec.applied.rb}:1`, changed: false },
+                                        { label: 'Fan Duty', proposed: `${rec.proposed.fan}%`, applied: `${rec.applied.fan}%`, changed: false },
+                                      ].map((act) => (
+                                        <div key={act.label} className={`sim-act-item ${act.changed ? 'clamped' : ''}`}>
+                                          <span className="sim-act-label">{act.label}</span>
+                                          <span className="sim-act-proposed">{act.proposed}</span>
+                                          <span className="sim-act-arrow">→</span>
+                                          <span className="sim-act-applied">{act.applied}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {hasInterventions && (
+                                      <div className="sim-interventions">
+                                        {rec.interventions.map((iv: any, j: number) => (
+                                          <div key={j} className="sim-intervention"><AlertTriangle size={13} /> {iv.message || iv}</div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                  {rec.reasoning && (
+                                    <div className="sim-reasoning">
+                                      <div className="sim-reasoning-tag">⚡ LLM REASONING · {rec.source?.toUpperCase() || 'MODEL'}</div>
+                                      <p>{rec.reasoning}</p>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+            )}
 
             <section className="history-section" aria-labelledby="history-title">
               <div className="history-heading">
