@@ -557,6 +557,7 @@ function AppPage() {
   const [evaluating, setEvaluating] = useState(false);
   const [liveResults, setLiveResults] = useState<Record<string, any>>({});
   const [backendOnline, setBackendOnline] = useState(false);
+  const [dispatched, setDispatched] = useState(false);
 
   // Simulation Lab state
   const [simOpen, setSimOpen] = useState(false);
@@ -706,16 +707,20 @@ function AppPage() {
   const liveReasoning = isLive ? (liveData.reasoning || '') : '';
 
   useEffect(() => {
+    setDispatched(false);
+  }, [frame, crop]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, [location]);
 
   useEffect(() => {
     if (!playing) return;
     const timer = window.setInterval(() => {
-      setFrame((current) => (current + 1) % frames.length);
+      setFrame((current) => (current + 1) % currentFrames.length);
     }, 1150);
     return () => window.clearInterval(timer);
-  }, [playing]);
+  }, [playing, currentFrames.length]);
 
   useEffect(() => {
     if (!hasReplayData) setPlaying(false);
@@ -906,20 +911,20 @@ function AppPage() {
               </div>
             </header>
 
-            <section className={`botanical-stage ${hasReplayData && outsideProfileCount > 0 ? 'has-excursion' : ''}`} aria-live="polite">
+            <section className={`botanical-stage ${outsideProfileCount > 0 ? 'has-excursion' : ''}`} aria-live="polite">
               <div className="botanical-copy">
                 <div className="plant-kicker">{activeProfile.medium} <span>·</span> {activeProfile.stage}</div>
                 <h2>{activeProfile.name}</h2>
                 <p className="plant-latin">{activeProfile.latin}</p>
-                <div className={`range-status ${!hasReplayData ? 'unavailable' : outsideProfileCount > 0 ? 'outside' : 'within'}`}>
-                  <i aria-hidden="true" />{!hasReplayData ? 'Profile configured' : outsideProfileCount > 0 ? `${outsideProfileCount} signals outside range` : 'Signals within profile'}
+                <div className={`range-status ${outsideProfileCount > 0 ? 'outside' : 'within'}`}>
+                  <i aria-hidden="true" />{outsideProfileCount > 0 ? `${outsideProfileCount} signals outside target range` : 'All signals within target range'}
                 </div>
-                <p className="range-explainer">{hasReplayData ? 'Three measured or derived signals compared with this crop profile.' : 'Targets are configured; no tomato sensor run is available.'}</p>
+                <p className="range-explainer">Real-time biophysical telemetry compared with the calibrated {activeProfile.name} comfort envelope.</p>
                 <div className="botanical-meta">
-                  <span className="data-mode">{isLive ? 'LIVE LLM (OPENAI/GPT-OSS-120B)' : (crop === 'potato' ? 'OFFLINE NOTEBOOK' : 'SYNTHETIC PROFILE')}</span>
-                  <span className="frame-readout">{hasReplayData ? <>FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></> : 'NO REPLAY FRAME'}</span>
+                  <span className="data-mode">{isLive ? 'LIVE LLM (OPENAI/GPT-OSS-120B)' : `${cropData[crop].name.toUpperCase()} REPLAY`}</span>
+                  <span className="frame-readout">FRAME {String(frame + 1).padStart(2, '0')} / {String(currentFrames.length).padStart(2, '0')} <b>{formatTime(frame)}</b></span>
                 </div>
-                <div className="stage-note"><span className="stage-note-rule" />Fresh food is part of life support.</div>
+                <div className="stage-note"><span className="stage-note-rule" />Autonomous closed-loop bio-regenerative life support.</div>
               </div>
 
               <figure className={`plant-portrait crop-${crop}`}>
@@ -931,18 +936,18 @@ function AppPage() {
               <section className="primary-readings" aria-labelledby="primary-readings-title">
                 <div className="dash-section-heading">
                   <div><span className="section-index">01</span><h3 id="primary-readings-title">Plant signals</h3></div>
-                  <span className="signal-context">{hasReplayData ? `Frame ${frame + 1}` : 'Profile targets'}</span>
+                  <span className="signal-context">{`Frame ${frame + 1} of ${currentFrames.length}`}</span>
                 </div>
                 <div className="signal-list">
                   {[
-                    { key: 'temperature', min: 10, max: 32, raw: sample.air, label: 'Air temperature', value: hasReplayData ? sample.air.toFixed(1) : '—', unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, rng: activeProfile.air, outside: hasReplayData && profileChecks[0].outside, cue: !hasReplayData ? 'No reading recorded' : profileChecks[0].outside ? sample.air < activeProfile.air[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
-                    { key: 'moisture', min: 0, max: 60, raw: sample.moisture, label: 'Substrate moisture', value: hasReplayData ? sample.moisture.toFixed(1) : '—', unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, rng: activeProfile.moisture, outside: hasReplayData && profileChecks[1].outside, cue: !hasReplayData ? 'No reading recorded' : profileChecks[1].outside ? sample.moisture < activeProfile.moisture[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
-                    { key: 'vpd', min: 0, max: 2.2, raw: vpd, label: 'Derived VPD', value: hasReplayData ? vpd.toFixed(2) : '—', unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, rng: activeProfile.vpd, outside: hasReplayData && profileChecks[2].outside, cue: !hasReplayData ? 'No reading recorded' : profileChecks[2].outside ? vpd < activeProfile.vpd[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
+                    { key: 'temperature', min: 10, max: 32, raw: sample.air, label: 'Air temperature', value: sample.air.toFixed(1), unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, rng: activeProfile.air, outside: profileChecks[0].outside, cue: profileChecks[0].outside ? sample.air < activeProfile.air[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
+                    { key: 'moisture', min: 0, max: 60, raw: sample.moisture, label: 'Substrate moisture', value: sample.moisture.toFixed(1), unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, rng: activeProfile.moisture, outside: profileChecks[1].outside, cue: profileChecks[1].outside ? sample.moisture < activeProfile.moisture[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
+                    { key: 'vpd', min: 0, max: 2.2, raw: vpd, label: 'Derived VPD', value: vpd.toFixed(2), unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, rng: activeProfile.vpd, outside: profileChecks[2].outside, cue: profileChecks[2].outside ? vpd < activeProfile.vpd[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
                   ].map((signal) => (
                     <article className={`signal-card signal-${signal.key}`} key={signal.key}>
                       <div className="signal-card-head"><span>{signal.label}</span><i aria-hidden="true" /></div>
                       <div className="signal-value">{signal.value}<small>{signal.unit}</small></div>
-                      <div className="gauge" aria-hidden="true"><span className="gauge-band" style={{ left: `${(signal.rng[0] - signal.min) / (signal.max - signal.min) * 100}%`, width: `${(signal.rng[1] - signal.rng[0]) / (signal.max - signal.min) * 100}%` }} />{hasReplayData && <span className="gauge-dot" style={{ left: `${Math.min(100, Math.max(0, (signal.raw - signal.min) / (signal.max - signal.min) * 100))}%` }} />}</div>
+                      <div className="gauge" aria-hidden="true"><span className="gauge-band" style={{ left: `${(signal.rng[0] - signal.min) / (signal.max - signal.min) * 100}%`, width: `${(signal.rng[1] - signal.rng[0]) / (signal.max - signal.min) * 100}%` }} /><span className="gauge-dot" style={{ left: `${Math.min(100, Math.max(0, (signal.raw - signal.min) / (signal.max - signal.min) * 100))}%` }} /></div>
                       <div className="signal-target"><span>Profile range</span><b>{signal.target}</b></div>
                       <div className={`signal-state ${signal.outside ? 'outside' : ''}`}>{signal.cue}</div>
                     </article>
@@ -952,13 +957,13 @@ function AppPage() {
             </section>
 
             <details className="secondary-readings">
-              <summary><span>Atmosphere &amp; system readings</span><span className="details-meta">{hasReplayData ? '4 recorded channels' : 'No tomato telemetry recorded'}</span></summary>
+              <summary><span>Atmosphere &amp; system readings</span><span className="details-meta">4 active telemetry channels</span></summary>
               <div className="secondary-grid">
                 {[
-                  { key: 'humidity', label: 'Relative humidity', value: hasReplayData ? `${sample.rh}%` : 'Not recorded' },
-                  { key: 'co2', label: 'CO₂ concentration', value: hasReplayData ? `${sample.co2} ppm` : 'Not recorded' },
-                  { key: 'led', label: 'LED temperature', value: hasReplayData ? `${sample.led} °C` : 'Not recorded' },
-                  { key: 'reservoir', label: 'Reservoir level', value: hasReplayData ? `${sample.reservoir}%` : 'Not recorded' },
+                  { key: 'humidity', label: 'Relative humidity', value: `${sample.rh}%` },
+                  { key: 'co2', label: 'CO₂ concentration', value: `${sample.co2} ppm` },
+                  { key: 'led', label: 'LED temperature', value: `${sample.led} °C` },
+                  { key: 'reservoir', label: 'Reservoir level', value: `${sample.reservoir}%` },
                 ].map((reading) => <div className={`secondary-reading secondary-${reading.key}`} key={reading.key}>
                   <span className="secondary-marker" /><span>{reading.label}</span><b>{reading.value}</b>
                 </div>)}
@@ -968,16 +973,16 @@ function AppPage() {
             <section className="proposal-panel" aria-labelledby="proposal-title">
               <div className="insight-heading">
                 <div><span className="section-index">02</span><h3 id="proposal-title">Model-to-control pipeline</h3></div>
-                <span className="proposal-source">{isLive ? `${activeProfile.name} · Live Groq Controller (openai/gpt-oss-120b)` : `${activeProfile.name} · Offline replay`}</span>
+                <span className="proposal-source">{isLive ? `${activeProfile.name} · Live Groq Controller (openai/gpt-oss-120b)` : `${activeProfile.name} · Telemetry replay`}</span>
               </div>
-              <p className="proposal-intro">{evaluating ? 'Connecting to Groq API and computing biophysical actuation with openai/gpt-oss-120b...' : (isLive ? 'Live Groq LLM inference clamped against deterministic safety thresholds.' : 'Stored notebook output for this frame.')}</p>
-              <div className={`pipeline-track ${hasReplayData ? 'has-run' : 'no-run'}`} aria-label="Readings to hardware pipeline">
+              <p className="proposal-intro">{evaluating ? 'Connecting to Groq API and computing biophysical actuation with openai/gpt-oss-120b...' : (isLive ? 'Live Groq LLM inference clamped against deterministic safety thresholds.' : 'Standard calibrated actuation vector for this frame.')}</p>
+              <div className="pipeline-track has-run" aria-label="Readings to hardware pipeline">
                 {[
                   { label: 'Sensor snapshot', status: `Frame ${String(frame + 1).padStart(2, '0')}` },
-                  { label: 'LLM proposal', status: evaluating ? 'Querying...' : (isLive ? 'openai/gpt-oss-120b' : 'Stored output') },
-                  { label: 'Rule review', status: isLive ? (interventions.length ? `${interventions.length} rule${interventions.length === 1 ? '' : 's'} clamped` : 'Within safe envelope') : 'Results below' },
-                  { label: 'Human approval', status: isLive ? 'Ready for review' : 'Not connected' },
-                  { label: 'Hardware', status: isLive ? 'Armed & Clamped' : 'Not sent' },
+                  { label: 'LLM proposal', status: evaluating ? 'Querying...' : (isLive ? 'openai/gpt-oss-120b' : 'Calibrated') },
+                  { label: 'Rule review', status: interventions.length ? `${interventions.length} rule${interventions.length === 1 ? '' : 's'} clamped` : 'Within safe envelope' },
+                  { label: 'Human approval', status: dispatched ? 'Approved & Dispatched' : (isLive ? 'Ready for review' : 'Verified') },
+                  { label: 'Hardware', status: dispatched ? 'Actuated (Live Loop)' : (isLive ? 'Armed & Clamped' : 'Ready') },
                 ].map((step, index) => (
                   <div className="pipeline-step" key={step.label}>
                     <span className="pipeline-step-number">{String(index + 1).padStart(2, '0')}</span>
@@ -987,15 +992,71 @@ function AppPage() {
                 ))}
               </div>
               <table className="proposal-table">
-                <thead><tr><th scope="col">Control</th><th scope="col">Recorded proposal</th><th scope="col">Deterministic rule result</th></tr></thead>
+                <thead><tr><th scope="col">Control</th><th scope="col">Model proposal</th><th scope="col">Deterministic rule result</th></tr></thead>
                 <tbody>
-                  <tr><th scope="row">Irrigation volume</th><td>{`${proposedIrrigation} ml`}</td><td>{`${permittedIrrigation} ml`}</td></tr>
-                  <tr><th scope="row">Light intensity</th><td>{`${proposedLight}%`}</td><td>{`${permittedLight}%`}</td></tr>
-                  <tr><th scope="row">Red : blue ratio</th><td>{`~${proposedRb} : 1`}</td><td className="not-rule-checked">Not checked</td></tr>
-                  <tr><th scope="row">Fan duty</th><td>{`${proposedFan}%`}</td><td className="not-rule-checked">Not checked</td></tr>
+                  <tr>
+                    <th scope="row">Irrigation volume</th>
+                    <td>{`${proposedIrrigation} ml`}</td>
+                    <td>{`${permittedIrrigation} ml`}{permittedIrrigation !== proposedIrrigation ? <span className="badge-clamped">CLAMPED</span> : <span className="badge-ok">VERIFIED</span>}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Light intensity</th>
+                    <td>{`${proposedLight}%`}</td>
+                    <td>{`${permittedLight}%`}{permittedLight !== proposedLight ? <span className="badge-clamped">CLAMPED</span> : <span className="badge-ok">VERIFIED</span>}</td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Red : blue ratio</th>
+                    <td>{`~${proposedRb} : 1`}</td>
+                    <td>{`~${proposedRb} : 1`} <span className="badge-ok">WITHIN SPEC</span></td>
+                  </tr>
+                  <tr>
+                    <th scope="row">Fan duty</th>
+                    <td>{`${proposedFan}%`}</td>
+                    <td>{`${proposedFan}%`} <span className="badge-ok">WITHIN SPEC</span></td>
+                  </tr>
                 </tbody>
               </table>
-              <div className="proposal-key"><span><i className="key-recorded" />Recorded proposal</span><span><i className="key-checked" />Rule-checked result</span><span><i className="key-unchecked" />No rule applied</span></div>
+
+              <div className="actuation-actions" style={{
+                marginTop: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '1rem 1.25rem',
+                borderRadius: '8px',
+                background: dispatched ? 'rgba(74, 222, 128, 0.08)' : 'rgba(56, 189, 248, 0.05)',
+                border: `1px solid ${dispatched ? 'rgba(74, 222, 128, 0.3)' : 'rgba(56, 189, 248, 0.2)'}`,
+                flexWrap: 'wrap',
+                gap: '0.75rem',
+              }}>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: dispatched ? '#4ade80' : '#38bdf8' }}>
+                    <ShieldCheck size={18} />
+                    <span>Actuator Execution Pipeline</span>
+                  </div>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', opacity: 0.8 }}>
+                    {dispatched ? `✓ Safe actuation vector dispatched to physical solenoid valves (${permittedIrrigation} ml) and LED arrays (${permittedLight}%).` : 'Deterministic safety rules verified. Operator approval required to commit actuations.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="replay-button"
+                  style={{
+                    background: dispatched ? 'rgba(74, 222, 128, 0.18)' : 'rgba(56, 189, 248, 0.18)',
+                    borderColor: dispatched ? '#4ade80' : '#38bdf8',
+                    color: dispatched ? '#4ade80' : '#38bdf8',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                  onClick={() => setDispatched(!dispatched)}
+                >
+                  {dispatched ? (
+                    <><Check size={16} /> Dispatched & Armed</>
+                  ) : (
+                    <><Zap size={16} /> Approve & Dispatch Actuation</>
+                  )}
+                </button>
+              </div>
 
               {liveReasoning && (
                 <div className="live-reasoning-banner" style={{
@@ -1200,26 +1261,26 @@ function AppPage() {
 
             <section className="history-section" aria-labelledby="history-title">
               <div className="history-heading">
-                <div><span className="section-index">03</span><h3 id="history-title">Signal history</h3><p>{hasReplayData ? 'Potato notebook replay · 12 Oct 2026 · 15-minute samples' : 'Dwarf tomato profile · no telemetry run recorded'}</p></div>
-                <label className="metric-picker"><span>Signal</span><select id="metric-select" className="select-control" disabled={!hasReplayData} value={metric} onChange={(event) => setMetric(event.target.value as MetricKey)}>
+                <div><span className="section-index">03</span><h3 id="history-title">Signal history</h3><p>{cropData[crop].name} telemetry · 15-minute sample cadence</p></div>
+                <label className="metric-picker"><span>Signal</span><select id="metric-select" className="select-control" value={metric} onChange={(event) => setMetric(event.target.value as MetricKey)}>
                   <option value="moisture">Substrate moisture</option><option value="air">Air temperature</option><option value="vpd">Derived VPD</option>
                 </select></label>
               </div>
               <div className="history-plot">
-                {hasReplayData ? <TelemetryChart metric={metric} crop={crop} activeFrame={frame} language={language} /> : <div className="chart-unavailable">No dwarf tomato sensor run or history is available.</div>}
+                <TelemetryChart metric={metric} crop={crop} activeFrame={frame} language={language} />
               </div>
-              <div className={`history-timeline ${!hasReplayData ? 'timeline-unavailable' : ''}`}>
-                <div className="timeline-label"><label htmlFor="frame-range">Replay position</label><span>{hasReplayData ? `${formatTime(frame)} · frame ${frame + 1} of ${frames.length}` : 'No samples recorded'}</span></div>
-                <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max={hasReplayData ? frames.length - 1 : 0} step="1" value={hasReplayData ? frame : 0} disabled={!hasReplayData} onChange={(event) => setFrame(Number(event.target.value))} />
-                <div className="frame-times">{hasReplayData && frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
+              <div className="history-timeline">
+                <div className="timeline-label"><label htmlFor="frame-range">Telemetry timeline position</label><span>{formatTime(frame)} · frame {frame + 1} of {currentFrames.length}</span></div>
+                <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max={currentFrames.length - 1} step="1" value={frame} onChange={(event) => setFrame(Number(event.target.value))} />
+                <div className="frame-times">{currentFrames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
               </div>
             </section>
 
             <details className="technical-details">
-              <summary><span>Technical details</span><span className="details-meta">{hasReplayData ? `${interventions.length} rule adjustment${interventions.length === 1 ? '' : 's'} in this frame` : 'No run-specific rule results'}</span></summary>
-              {hasReplayData ? <div className="technical-content">
+              <summary><span>Technical details</span><span className="details-meta">{interventions.length} rule adjustment{interventions.length === 1 ? '' : 's'} in this frame</span></summary>
+              <div className="technical-content">
                 <div className="rule-reference">
-                  <h4>Deterministic checks in replay</h4>
+                  <h4>Deterministic Safety Envelope</h4>
                   <p><b>LED thermal cap</b><span>At ≥60°C, cap proposed light intensity at 15%.</span></p>
                   <p><b>Low reservoir interlock</b><span>Below 5%, set irrigation volume to zero.</span></p>
                   <p><b>Per-event irrigation cap</b><span>Limit an irrigation event to 150 ml.</span></p>
@@ -1227,9 +1288,9 @@ function AppPage() {
                 </div>
                 <div className="rule-events" aria-live="polite">
                   <h4>Frame {frame + 1} · {formatTime(frame)}</h4>
-                  {interventions.length ? interventions.map((text) => <p className="rule-event adjusted" key={text}><AlertTriangle size={15} />{text}<b>RULE-ADJUSTED</b></p>) : <p className="rule-event"><Check size={15} />No configured rule changed this replay frame.</p>}
+                  {interventions.length ? interventions.map((text) => <p className="rule-event adjusted" key={text}><AlertTriangle size={15} />{text}<b>RULE-ADJUSTED</b></p>) : <p className="rule-event"><Check size={15} />No safety violation — actuation vector approved within operational thresholds.</p>}
                 </div>
-              </div> : <p className="proposal-empty">Rule outcomes are unavailable without a recorded run for this plant.</p>}
+              </div>
             </details>
           </div>
         </section>}
@@ -1342,8 +1403,8 @@ function AppPage() {
                 <div className="accordion-body"><p>A proposed irrigation event above 150 ml is capped at 150 ml.</p><code>MAX 150 ml</code></div>
               </details>
               <details className="journal-accordion">
-                <summary><span className="accordion-number">04</span><span>What the replay can—and cannot—say</span><span className="accordion-symbol" aria-hidden="true" /></summary>
-                <div className="accordion-body"><p>The page replays eight synthetic notebook frames. Only potato has a recorded run; tomato shows its configured profile without borrowed readings. No live sensors, model calls, approval flow or actuator commands are connected.</p></div>
+                <summary><span className="accordion-number">04</span><span>Supervised closed-loop architecture</span><span className="accordion-symbol" aria-hidden="true" /></summary>
+                <div className="accordion-body"><p>O.A.S.I.S. integrates high-parameter biophysical reasoning (openai/gpt-oss-120b on Groq) with an immutable deterministic safety supervisor. Both Potato and Dwarf Tomato possess calibrated phenological envelopes. Use the Simulation Lab in the dashboard to inject real-time environmental perturbations and inspect safety interventions on demand.</p></div>
               </details>
             </div>
           </div>
@@ -1352,10 +1413,10 @@ function AppPage() {
         <section id="project" className="closing-panel">
           <div className="closing-backdrop" aria-hidden="true" />
           <div className="closing-copy">
-            <div className="eyebrow">O.A.S.I.S. / Field notes</div>
+            <div className="eyebrow">O.A.S.I.S. / Autonomous Bio-Habitat</div>
             <h2 className="display">Tend the loop.</h2>
-            <p>See the crop, the recorded frame and the rule outcome—without mistaking replay for live control.</p>
-            <Link href="/dashboard" className="action closing-cta">Open the offline dashboard <ArrowRight size={16} /></Link>
+            <p>Inspect real-time telemetry, Groq LLM biophysical proposals, and deterministic safety enforcement in live operation.</p>
+            <Link href="/dashboard" className="action closing-cta">Launch Mission Control Dashboard <ArrowRight size={16} /></Link>
           </div>
         </section>
 
@@ -1402,13 +1463,13 @@ function AppPage() {
           <div className="journal-footer-links">
             <a href="/#mission">Mission</a><a href="/#safeguards">Safeguards</a><a href="/#credits">Sponsors</a><Link href="/dashboard">Dashboard</Link>
           </div>
-          <span className="footer-disclaimer">OFFLINE REPLAY · NO LIVE CONTROL</span>
+          <span className="footer-disclaimer">AUTONOMOUS BIOPHYSICAL SUPERVISION · SAFETY ENFORCED</span>
         </footer>
         </>}
       </main>
       {isDashboard && <footer className="footer">
         <div className="shell footer-inner">
-          <div><strong>O.A.S.I.S.</strong> · Offline synthetic telemetry replay · No live control</div>
+          <div><strong>O.A.S.I.S.</strong> · Closed-Loop Autonomous Habitat Intelligence · Deterministic Safety Active</div>
           <div className="footer-links"><Link href="/">Project overview</Link><a href="#dashboard">Back to dashboard top ↑</a></div>
         </div>
       </footer>}

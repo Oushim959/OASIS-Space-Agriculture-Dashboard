@@ -396,8 +396,35 @@ img { display: block; max-width: 100%; }
 .proposal-table thead th { color: var(--ink-2); font: 500 13px var(--app-font-mono); text-transform: uppercase; letter-spacing: .06em; }
 .proposal-table tbody th { color: var(--forest); font-weight: 600; }
 .proposal-table td { color: var(--teal); font: 600 20px var(--app-font-serif); }
-.proposal-table td:nth-child(3) { color: var(--leaf); }
 .proposal-table td.not-rule-checked { color: var(--ink-2); font: 15.5px var(--app-font-sans); }
+.badge-clamped {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-family: var(--app-font-mono);
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.badge-ok {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-family: var(--app-font-mono);
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.25);
+  margin-left: 8px;
+  vertical-align: middle;
+}
 .execution-status { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-top: 14px; color: var(--ink-2); font-size: 15px; }
 .execution-status b { margin-left: 6px; color: var(--tomato); font-weight: 700; }
 .proposal-empty, .chart-unavailable { margin: 20px 0 0; color: var(--ink-2); font-size: 16.5px; }
