@@ -252,14 +252,6 @@ function AppPage() {
                 <li><b>2</b> crop profiles</li><li><b>8</b> synthetic frames</li><li><b>3</b> hard safeguards</li>
               </ul>
             </div>
-            <div className="hero-visual">
-              <figure className="hero-photo">
-                <img src="/images/nasa-veggie.jpg" alt="Astronaut tending plant pillows in the Veggie growth chamber under pink LED light" />
-                <figcaption>Photo: NASA, Veggie plant growth on the International Space Station</figcaption>
-              </figure>
-              <div className="hero-card"><CropPlant crop="potato" /><div><span>Primary crop</span><b>Potato</b><i>Solanum tuberosum</i></div></div>
-              <div className="hero-card hero-card-2"><CropPlant crop="tomato" /><div><span>Profile only</span><b>Dwarf tomato</b><i>No run data</i></div></div>
-            </div>
           </div>
         </section>
 
