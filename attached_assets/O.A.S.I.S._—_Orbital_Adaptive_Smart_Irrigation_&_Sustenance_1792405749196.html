@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O.A.S.I.S. — Orbital Adaptive Smart Irrigation & Sustenance</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500&display=swap">
+<style>
+:root{--bg:#0B0F19;--panel:#121827;--line:#232c42;--tx:#e9eef7;--mut:#8b97b3;--g:#10B981;--c:#06B6D4;--r:#f0566a;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*:before,*:after{box-sizing:inherit}html{scroll-behavior:smooth;scroll-padding-top:60px}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.6 'IBM Plex Sans',system-ui,sans-serif}
+h1,h2,h3,.d{font-family:'Chakra Petch',system-ui,sans-serif;margin:0;line-height:1.1}
+a{color:var(--c)}main,nav,footer{max-width:1180px;margin:auto;padding:0 20px}
+nav{display:flex;gap:22px;align-items:center;height:56px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--line);max-width:none;padding:0 max(20px,calc((100% - 1140px)/2))}
+nav b{font:700 20px 'Chakra Petch';margin-right:auto;letter-spacing:.04em}nav a{color:var(--mut);text-decoration:none;font-size:14px}nav a:hover{color:var(--tx)}
+.hero{padding:70px 0 50px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.hero h1{font-size:clamp(42px,7vw,84px);font-weight:700}.hero h1 span{color:var(--g)}
+.hero p{color:var(--mut);max-width:52ch;font-size:18px}
+.btn{display:inline-block;background:var(--g);color:#04130d;padding:11px 20px;border-radius:6px;font:700 15px 'Chakra Petch';text-decoration:none;margin:8px 10px 0 0;border:0;cursor:pointer}.btn.o{background:none;color:var(--c);border:1px solid var(--c)}
+section{padding:56px 0;border-top:1px solid var(--line)}section>h2{font-size:clamp(28px,4vw,42px);margin-bottom:10px}section>p.l{color:var(--mut);max-width:70ch;margin:0 0 28px}
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0}.loop div{padding:18px;border-left:2px solid var(--c)}.loop h3{font-size:20px;color:var(--c)}.loop p{margin:6px 0 0;color:var(--mut);font-size:14px}
+.dash{display:grid;grid-template-columns:260px 1fr 320px;gap:14px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}.box h3{font-size:16px;margin-bottom:10px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.bar select,.bar button{background:var(--panel);color:var(--tx);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.bar button.on{border-color:var(--g);color:var(--g)}.tag{font-size:13px;color:var(--mut);margin-left:auto}
+.sl{margin-bottom:12px}.sl label{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}.sl output{font-weight:500}.sl input{width:100%;accent-color:var(--c)}
+.ok{color:var(--g)}.bad{color:var(--r)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ch .t{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}.ch svg{width:100%;height:78px;display:block}
+.vec{margin-bottom:12px;font-size:14px}.vec .tr{height:8px;background:#1b2338;border-radius:4px;position:relative;margin-top:5px}.vec .a{position:absolute;left:0;top:0;bottom:0;background:var(--c);border-radius:4px}.vec .p{position:absolute;top:-3px;bottom:-3px;width:3px;background:#fff;opacity:.8}
+.vec .n{display:flex;justify-content:space-between}
+.alert{border-left:3px solid var(--r);padding:6px 10px;margin:6px 0;font-size:13px;background:#1c1622}.safe{border-left-color:var(--g);background:#0f1f1d;color:var(--mut)}
+.why{font-size:13px;color:var(--mut);max-height:150px;overflow:auto}
+.chat{margin-top:14px}.log{height:130px;overflow:auto;font-size:14px;margin-bottom:8px}.log p{margin:0 0 6px}.log .u{color:var(--c)}
+.chat form{display:flex;gap:6px}.chat input{flex:1;min-width:0;background:#0d1322;border:1px solid var(--line);color:var(--tx);border-radius:6px;padding:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--mut);font-weight:500}tr.sel td{color:var(--g)}.sc{overflow-x:auto}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.cards .box p{margin:0;color:var(--mut);font-size:14px}
+.sch{width:100%;max-width:480px}
+@media(max-width:960px){.hero,.dash{grid-template-columns:1fr}.loop,.cards{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.loop,.cards,.charts{grid-template-columns:1fr}nav a{display:none}}
+:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+body{background:radial-gradient(1000px 600px at 85% -5%,#3a22a455,transparent),radial-gradient(800px 500px at -10% 45%,#06B6D41f,transparent),radial-gradient(700px 500px at 100% 85%,#10B9811c,transparent),var(--bg)}
+body:before{content:"";position:fixed;inset:0;z-index:-1;opacity:.55;background-image:radial-gradient(1px 1px at 20px 30px,#fff,transparent),radial-gradient(1px 1px at 120px 90px,#fff9,transparent),radial-gradient(1.5px 1.5px at 200px 160px,#fff,transparent),radial-gradient(1px 1px at 70px 150px,#9ff,transparent);background-size:240px 200px}
+nav{background:rgba(11,15,25,.6);backdrop-filter:blur(14px)}
+.hero{position:relative;padding-top:50px;min-height:560px}.hero>div:first-child{position:relative;z-index:3}
+.hero h1{font-size:clamp(46px,7.5vw,96px);text-shadow:0 8px 40px #0b0f19}
+.stage{perspective:1000px;margin-left:-70px;position:relative;z-index:2}
+.scene{position:relative;height:500px;transform-style:preserve-3d;transition:transform .25s ease-out}
+.scene>*{position:absolute}
+.planet{top:10px;right:10px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#a78bfa,#5b3fd6 35%,#1e1458 70%,#0b0f19);box-shadow:0 0 90px #6d4aff66,inset -30px -30px 70px #0b0f19}
+.ring{top:-60px;right:-65px;width:450px;height:450px;border-radius:50%;border:3px solid #06B6D4aa;transform:rotateX(74deg) rotateZ(-18deg);box-shadow:0 0 28px #06B6D488,inset 0 0 28px #06B6D455}
+.ring.r2{top:-95px;right:-100px;width:520px;height:520px;border-width:1px;opacity:.5}
+.moon{top:250px;right:330px;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fde68a,#f59e0b 60%,#7c2d12);box-shadow:0 0 30px #f59e0b66}
+.dome{left:30px;bottom:0;width:290px;height:290px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 80%,#0f3b36,#07191d 70%);border:1px solid #ffffff55;box-shadow:inset 0 0 50px #06B6D488,0 0 90px #10B98155,0 40px 60px -20px #000}
+.dome:after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(ellipse at 30% 18%,#ffffff66,transparent 32%),linear-gradient(135deg,#ffffff1f,transparent 40%)}
+.dome svg{position:absolute;inset:0;width:100%;height:100%}
+.leaf{width:230px;height:230px;transform-origin:50% 100%;animation:sway 6s ease-in-out infinite;filter:drop-shadow(0 18px 20px #000a)}
+.leaf.l1{left:-40px;bottom:-30px}.leaf.l2{right:60px;bottom:-40px;width:270px;height:270px;animation-delay:-3s}
+@keyframes sway{50%{transform:rotate(5deg)}}
+.chip{padding:9px 14px;border-radius:14px;background:#121827aa;backdrop-filter:blur(10px);border:1px solid #ffffff22;font-size:13px;box-shadow:0 18px 40px -12px #000}.chip b{color:var(--g);display:block;font:700 20px 'Chakra Petch'}.chip.a{top:60px;left:90px}.chip.b{top:200px;right:0}.chip.c{bottom:90px;right:250px}.chip.d b{color:var(--c)}
+.box{background:linear-gradient(160deg,#1a2340cc,#0e1424b3);backdrop-filter:blur(12px);border-color:#ffffff1a;box-shadow:0 30px 70px -30px #06B6D44d,inset 0 1px 0 #ffffff12}
+.loop{gap:14px}.loop div{border:1px solid #ffffff1a;border-top:3px solid var(--g);border-radius:12px;background:#121827aa;transition:transform .25s}.loop div:nth-child(even){transform:translateY(22px);border-top-color:var(--c)}.loop div:hover,.cards .box:hover{transform:perspective(600px) rotateX(5deg) translateY(-6px)}.cards .box{transition:transform .25s}
+#dash{position:relative}#dash:before{content:"";position:absolute;right:-120px;top:-60px;width:420px;height:420px;border-radius:50%;z-index:-1;background:radial-gradient(circle at 35% 30%,#7c5cff55,#1e145822 60%,transparent 70%)}
+.vec .a{background:linear-gradient(90deg,var(--g),var(--c));box-shadow:0 0 12px #06B6D488}
+section{border-top:0}
+@media(max-width:960px){.stage{margin:0}.scene{height:430px}.planet{width:240px;height:240px}.ring{width:340px;height:340px;right:-45px}.ring.r2{display:none}.moon{right:230px}.chip.c{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+:root{--bg:#F4FAF1;--panel:#fff;--line:#d8e8d6;--tx:#10261c;--mut:#5a7565;--g:#12A15F;--c:#0E8F6E;--r:#d6405a;color-scheme:light}
+body{font-family:'DM Sans',system-ui,sans-serif;background:linear-gradient(180deg,#dff3d6 0,#F4FAF1 640px)}body:before{display:none}
+h1,h2,h3,h4,.d,nav b,.btn,.chip b,.gr b{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+nav{background:#f4faf1cc;border-bottom-color:#d8e8d6}nav b{color:#0E3B2E}nav a{color:#4a6a57}
+.hero h1{color:#0E3B2E;text-shadow:none;font-weight:800;letter-spacing:-.02em}.hero h1 span{color:var(--g)}
+.btn{background:#0E3B2E;color:#fff;border-radius:99px;padding:12px 24px}.btn.o{background:none;color:#0E3B2E;border:1.5px solid #0E3B2E}
+section>h2{color:#0E3B2E;font-weight:800;letter-spacing:-.02em}
+.box{background:#fff;border-color:#d8e8d6;backdrop-filter:none;border-radius:22px;box-shadow:0 18px 40px -22px #0e3b2e55}
+.loop div{border:0;border-radius:22px;background:#e8f7d4;box-shadow:none}.loop div:nth-child(2){background:#dff3ea}.loop div:nth-child(3){background:#f6f1d9}.loop div:nth-child(4){background:#e0f0f5}.loop div:nth-child(even){border:0}.loop h3{color:#0E3B2E}
+.cards .box:nth-child(1){background:#e8f7d4}.cards .box:nth-child(2){background:#dff3ea}.cards .box:nth-child(3){background:#f6f1d9}
+.bar select,.bar button{background:#fff;color:var(--tx);border-radius:99px}.bar button.on{background:#0E3B2E;color:#C9F36B;border-color:#0E3B2E}
+.vec .tr{background:#e6f1e4}.vec .a{background:linear-gradient(90deg,#12A15F,#C9F36B);box-shadow:none}.vec .p{background:#0E3B2E}
+.alert{background:#fdecef}.alert.safe{background:#eaf7ee}.chat input{background:#f4faf1;color:var(--tx)}.log .u{color:#0E8F6E}
+.ch svg polyline{stroke:#12A15F}.ch svg circle[fill="#06B6D4"]{fill:#12A15F}.ch svg circle[fill="#fff"]{fill:#0E3B2E}
+#dash:before{background:radial-gradient(circle at 35% 30%,#c9f36b99,#9be3b422 60%,transparent 70%)}
+.vw{perspective:1000px;position:relative;z-index:2}
+.orb{top:0;right:0;width:310px;height:310px;border-radius:50%;background:radial-gradient(circle at 30% 28%,#f1fcd2,#b6e8a0 45%,#6fc48d);box-shadow:0 30px 60px -20px #12A15F66}
+.orbit{top:-40px;right:-60px;width:430px;height:430px;border-radius:50%;border:2px solid #0E3B2E55;transform:rotateX(74deg) rotateZ(-18deg)}
+.phone{left:50%;margin-left:-115px;top:20px;width:230px;height:460px;border-radius:42px;background:#0E3B2E;padding:9px;transform:rotateZ(3deg);box-shadow:0 40px 70px -20px #0E3B2E99,inset 0 0 0 2px #2c6b55}
+.scr{height:100%;border-radius:34px;background:linear-gradient(180deg,#dcf3d3,#fff 65%);padding:36px 16px 14px;color:#10261c;display:flex;flex-direction:column;overflow:hidden;position:relative}.scr:before{content:"";position:absolute;top:9px;left:50%;margin-left:-32px;width:64px;height:18px;border-radius:9px;background:#0E3B2E}
+.scr small{font-size:11px;color:#5a7565}.scr h4{font-size:30px;font-weight:800;line-height:1.02;margin:4px 0 0;color:#0E3B2E}.pl{flex:1;min-height:0;width:100%}
+.pills{display:flex;gap:6px}.pills span{flex:1;background:#fff;border-radius:12px;padding:6px 2px;font-size:10px;text-align:center;color:#5a7565;box-shadow:0 4px 10px #0e3b2e18}.pills b{color:#0E3B2E;font-size:11px}
+.gr{top:270px;left:10px;width:132px;height:132px;border-radius:50%;background:#0E3B2E;color:#fff;display:grid;place-items:center;text-align:center;box-shadow:0 24px 40px -10px #0E3B2E88}.gr svg{position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px)}.gr b{font-size:30px;position:relative;margin-top:14px;line-height:1}.gr i{font-size:11px;font-style:normal;color:#C9F36B;position:relative;margin-top:-34px}
+.chip{background:#ffffffe6;border-color:#d8e8d6;color:#5a7565;box-shadow:0 14px 30px -10px #0e3b2e55}.chip b{color:#0E3B2E}.chip.d b{color:#0E8F6E}.chip.a{top:70px;left:0}.chip.b{top:200px;right:-6px}
+.leaf{filter:drop-shadow(0 16px 18px #0e3b2e55)}.leaf.l1{left:-60px;bottom:-40px}.leaf.l2{right:10px;bottom:-50px}
+footer.ft{max-width:none;margin:40px 0 0;padding:0}.ft svg{display:block;width:100%;height:120px}.ft p{background:#0E3B2E;margin:0;padding:6px 20px 36px!important;text-align:center;color:#a9d9bd!important}
+@media(max-width:960px){.vw{margin:0}.orb{width:230px;height:230px}.orbit{width:320px;height:320px}.chip.b{right:0}}
+</style></head><body>
+<nav><b>O.A.S.I.S.</b><a href="#loop">Loop</a><a href="#dash">Dashboard</a><a href="#safety">Safety</a><a href="#model">Model</a><a href="#team">Team</a></nav>
+<main>
+<div class="hero"><div>
+<h1>Fresh food that <span>thinks</span> for itself.</h1>
+<p>O.A.S.I.S. is a deployable space greenhouse with an LLM brain. It reads sensors, proposes irrigation, light and airflow, and a deterministic safety envelope has the final say.</p>
+<a class="btn" href="#dash">Open live dashboard</a><a class="btn o" href="#loop">How it works</a></div>
+<div class="vw"><div class="scene" id="scene" aria-hidden="true"><div class="orb" data-d="10"></div><div class="orbit" data-d="20"></div>
+<div class="phone" data-d="26"><div class="scr"><small>Greenhouse · Potato</small><h4>Scan your plants</h4><svg class="pl" viewBox="0 0 180 200"><g fill="none" stroke="#12A15F" stroke-width="3" stroke-linecap="round"><path d="M20 40V22H38M142 22H160V40M160 160V178H142M38 178H20V160"/><path d="M90 168C90 130 88 100 92 70" stroke-width="4"/></g><path d="M91 100C60 100 40 80 38 58C70 56 90 74 91 100Z" fill="#2f9e6b"/><path d="M92 82C122 84 140 66 144 44C112 42 94 60 92 82Z" fill="#7fcf95"/><path d="M91 72C76 62 78 44 90 32C102 44 102 62 91 72Z" fill="#12A15F"/><ellipse cx="90" cy="172" rx="46" ry="10" fill="#6b4a32"/><circle cx="58" cy="62" r="3" fill="#ffffffcc"/><circle cx="128" cy="52" r="3" fill="#ffffffcc"/></svg><div class="pills"><span>Plant<br><b>Excellent</b></span><span>Light<br><b>Good</b></span><span>Water<br><b>Optimal</b></span></div></div></div>
+<div class="gr" data-d="44"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#2b5a46" stroke-width="6"/><circle cx="40" cy="40" r="34" fill="none" stroke="#C9F36B" stroke-width="6" stroke-linecap="round" stroke-dasharray="145 214" transform="rotate(-90 40 40)"/></svg><b>68%</b><i>growth rate</i></div>
+<div class="chip a" data-d="40">VPD<b>0.85 kPa</b></div><div class="chip b d" data-d="48">Irrigation<b>20 ml</b></div>
+<svg class="leaf l1" data-d="52" viewBox="0 0 200 200"><path d="M100 200C80 140 20 110 10 40C70 50 120 110 100 200Z" fill="#2f9e6b"/><path d="M100 200C60 150 30 100 10 40" stroke="#c9f36b" stroke-opacity=".7" fill="none"/><circle cx="52" cy="90" r="6" fill="#ffffffb0"/><circle cx="70" cy="128" r="4" fill="#ffffffb0"/></svg>
+<svg class="leaf l2" data-d="64" viewBox="0 0 200 200"><path d="M100 200C130 140 190 110 195 30C130 45 80 110 100 200Z" fill="#7fcf95"/><path d="M100 200C140 150 170 90 195 30" stroke="#fff" stroke-opacity=".6" fill="none"/><circle cx="150" cy="80" r="6" fill="#ffffffc0"/><circle cx="128" cy="124" r="4" fill="#ffffffc0"/></svg></div></div>
+<div class="stage" style="display:none"><div class="scene" id="old" aria-hidden="true"><div class="planet" data-d="10"></div><div class="ring" data-d="18"></div><div class="ring r2" data-d="26"></div><div class="moon" data-d="34"></div>
+<div class="dome" data-d="22"><svg viewBox="0 0 290 290"><defs><linearGradient id="lg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#047857"/><stop offset="1" stop-color="#6ee7b7"/></linearGradient></defs><rect x="0" y="250" width="290" height="40" fill="#1b2a44"/><g transform="translate(145 252)" fill="url(#lg)"><path d="M0 0C-14-70-70-100-84-140C-26-128 12-70 0 0Z" transform="rotate(-18)"/><path d="M0 0C-14-70-70-100-84-140C-26-128 12-70 0 0Z" transform="rotate(32) scale(.85)"/><path d="M0 0C-14-70-70-100-84-140C-26-128 12-70 0 0Z" transform="rotate(-60) scale(.7)"/><path d="M0 0C-14-70-70-100-84-140C-26-128 12-70 0 0Z" transform="rotate(70) scale(.6)"/></g><g fill="#f0566a"><circle cx="110" cy="150" r="9"/><circle cx="188" cy="170" r="7"/></g><g fill="#f4d35e"><rect x="60" y="40" width="170" height="6" rx="3" fill="#f0566a"/><rect x="60" y="40" width="58" height="6" rx="3" fill="#4c7dff"/></g></svg></div>
+<svg class="leaf l1" data-d="52" viewBox="0 0 200 200"><defs><linearGradient id="lg2" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#065f46"/><stop offset="1" stop-color="#34d399"/></linearGradient></defs><path d="M100 200C80 140 20 110 10 40C70 50 120 110 100 200Z" fill="url(#lg2)"/><path d="M100 200C60 150 30 100 10 40" stroke="#a7f3d0" stroke-opacity=".5" fill="none"/></svg>
+<svg class="leaf l2" data-d="64" viewBox="0 0 200 200"><path d="M100 200C130 140 190 110 195 30C130 45 80 110 100 200Z" fill="url(#lg2)"/><path d="M100 200C140 150 170 90 195 30" stroke="#a7f3d0" stroke-opacity=".5" fill="none"/></svg>
+<div class="chip a" data-d="40">VPD<b>0.85 kPa</b></div><div class="chip b d" data-d="48">Irrigation<b>20 ml</b></div><div class="chip c" data-d="30">LED array<b>38 °C</b></div></div></div>
+<svg class="sch" style="display:none" viewBox="0 0 480 330" role="img" aria-label="Deployable greenhouse cutaway schematic">
+<path d="M70 280 L130 90 L350 90 L410 280Z" fill="#0f1a2b" stroke="#06B6D4" stroke-width="2"/>
+<path d="M130 90 L190 280 M350 90 L290 280 M240 90 L240 280" stroke="#06B6D4" stroke-opacity=".4" stroke-dasharray="5 5"/>
+<rect x="150" y="104" width="180" height="10" rx="5" fill="#f0566a"/><rect x="150" y="104" width="60" height="10" rx="5" fill="#4c7dff"/>
+<path d="M160 118 L160 150 M240 118 L240 150 M320 118 L320 150" stroke="#f0566a" stroke-opacity=".4" stroke-width="14"/>
+<g fill="#10B981"><path d="M200 255 Q190 190 215 175 Q225 200 200 255Z"/><path d="M200 255 Q215 200 250 195 Q245 230 200 255Z"/><path d="M290 255 Q280 200 300 180 Q315 205 290 255Z"/></g>
+<rect x="110" y="258" width="260" height="22" rx="4" fill="#1b2a44"/><path d="M130 280 q10 22 20 0 M210 280 q10 22 20 0 M290 280 q10 22 20 0" stroke="#06B6D4" fill="none"/>
+<circle cx="365" cy="170" r="6" fill="#06B6D4"/><circle cx="115" cy="170" r="6" fill="#06B6D4"/><circle cx="240" cy="75" r="9" fill="none" stroke="#10B981" stroke-width="2"/>
+<g fill="#8b97b3" font-size="12" font-family="IBM Plex Sans"><text x="378" y="174">sensors</text><text x="30" y="174">DHT / SCD30</text><text x="258" y="70">ESP32-CAM</text><text x="150" y="304">aeroponic root zone</text><text x="150" y="82">R:B LED array</text></g></svg></div>
+
+<section id="loop"><h2>Sense. Think. Act.</h2><p class="l">Each telemetry frame passes through four steps. The model may only propose; hard limits decide what reaches the pumps and lights.</p>
+<div class="loop"><div><h3>Ingest</h3><p>Air temperature, humidity, substrate moisture, CO₂, LED temperature, reservoir level.</p></div><div><h3>Derive</h3><p>Vapor pressure deficit from temperature and humidity (Tetens approximation).</p></div><div><h3>Propose</h3><p>gpt-oss-120b receives targets and space risks, and returns a control vector with its reasoning.</p></div><div><h3>Validate</h3><p>Rules clamp LED power, pump and irrigation volume before actuation.</p></div></div></section>
+
+<section id="dash"><h2>Mission dashboard</h2><p class="l">Replay the eight recorded frames from the notebook (real model decisions), or drag any slider to take manual control. Manual mode uses an offline heuristic standing in for the model; the safety rules are always the real ones.</p>
+<div class="bar"><select id="crop" aria-label="Crop"><option value="potato">Potato · tuber bulking</option><option value="tomato">Dwarf tomato · fruiting</option></select>
+<span id="fb"></span><button id="play">▶ Play replay</button><span class="tag" id="src"></span></div>
+<div class="dash">
+<div class="box"><h3>Telemetry</h3><div id="sl"></div><div id="vpd" class="d" style="font-size:22px"></div></div>
+<div><div class="box"><h3>Trends (8 frames, 15 min apart)</h3><div class="charts" id="ch"></div></div>
+<div class="box chat"><h3>Astronaut console</h3><div class="log" id="log" aria-live="polite"></div><form id="cf"><input id="ci" placeholder="Ask: status, water, vpd, harvest…" aria-label="Ask O.A.S.I.S."><button class="btn" style="margin:0">Ask</button></form></div></div>
+<div class="box"><h3>Control vector</h3><div id="vec"></div><h3 style="margin-top:14px">Safety layer</h3><div id="iv"></div><h3 style="margin-top:14px">Reasoning</h3><div class="why" id="why"></div></div>
+</div></section>
+
+<section id="safety"><h2>Safety envelope</h2><p class="l">Plain Python in the notebook, mirrored here in JavaScript. Rules only ever reduce actuation.</p>
+<div class="cards"><div class="box"><h3>LED over-temperature</h3><p>LED ≥ 60 °C caps light intensity at 15%.</p></div><div class="box"><h3>Dry-pump protection</h3><p>Reservoir below 5% forces irrigation to 0 ml.</p></div><div class="box"><h3>Irrigation cap</h3><p>Requests above 150 ml are reduced to 150 ml.</p></div></div></section>
+
+<section id="model"><h2>Why gpt-oss-120b</h2><p class="l">Benchmarked on anomalous Martian-greenhouse telemetry, three runs each. The two Llama rows failed from a bad endpoint string, so their latencies mean nothing.</p>
+<div class="sc"><table><tr><th>Model</th><th>Avg (s)</th><th>Valid JSON</th><th>Notes</th></tr>
+<tr><td>Qwen2.5-7B (local T4)</td><td>37.66</td><td>3/3</td><td>Inverted cooling: A/C off at high temperature</td></tr>
+<tr><td>llama-3.1-8b-instant</td><td>0.07</td><td>0/3</td><td>API 404</td></tr>
+<tr><td>llama-3.3-70b-versatile</td><td>0.04</td><td>0/3</td><td>API 404</td></tr>
+<tr><td>gpt-oss-20b</td><td>1.63</td><td>3/3</td><td>Fast, standard logic</td></tr>
+<tr class="sel"><td>gpt-oss-120b (selected)</td><td>3.37</td><td>3/3</td><td>Correct cooling, relay-level targets, EVA safety steps</td></tr></table></div></section>
+
+<section id="team"><h2>Built for Space Lead ’26</h2><p class="l">Boeing Space Lead Hackathon, Alfaisal University, 25–26 October. Three workstreams: hardware and IoT (ESP32, sensors, LED and pump actuation), LLM and biological intelligence (this dashboard’s brain), and poster and visual communication.</p>
+<p class="l" style="font-size:14px">Limits: the dataset is synthetic (8 frames), only potato and dwarf tomato are defined, and the safety rules cover three hazards.</p></section>
+</main><footer class="ft"><svg viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0 70C200 10 350 100 600 50S1000 0 1200 60V120H0Z" fill="#bfe5b6"/><path d="M0 90C250 40 450 110 700 70S1050 30 1200 85V120H0Z" fill="#6fc48d"/><path d="M0 106C300 70 600 120 900 92S1100 82 1200 100V120H0Z" fill="#0E3B2E"/></svg><p style="color:var(--mut);font-size:13px;padding-bottom:30px">O.A.S.I.S. · Orbital Adaptive Smart Irrigation & Sustenance</p></footer>
+<script>
+const $=id=>document.getElementById(id),K={potato:{vpd:[.8,1.2],t:[18,22],s:[35,45],dli:18,n:'potato'},tomato:{vpd:[1,1.4],t:[21,26],s:[40,50],dli:22,n:'dwarf tomato'}};
+const F=[[20.1,64,40.2,950,38,80],[21.5,58,35,980,42,78],[24.8,42,18.4,940,52,75],[26.2,38,15,1100,63.5,72],[21,62,38,960,39,70],[20.5,65,41,950,37.5,68],[23,48,28,1020,58,65],[25.5,40,16,1150,64,3.5]];
+const M=[[20,80,70,4.5,'Within window; modest 20 ml top-up avoids perchlorate saturation and waterlogging.'],[20,70,70,5.5,'Moisture at lower bound; higher red:blue promotes tuber growth, fan raised to shed LED heat.'],[30,70,80,4.5,'Moisture far below band and VPD 1.8 kPa: more ventilation, lighter heat load.'],[80,30,80,4.5,'Moisture 15%: 80 ml pulse; VPD 2.11 kPa so high ventilation. Light ~30% for the DLI target.'],[20,62,55,4.5,'Back within targets; ~62% light meets DLI, 55% fan for cooling and root oxygenation.'],[20,70,40,5,'Comfortably in range; light top-up only, moderate fan.'],[30,70,80,4.5,'Moisture 28% and VPD 1.46 kPa: 30 ml, ventilation to 80%, light cut to limit heat.'],[45,70,80,4.5,'Moisture 16%: 45 ml, ventilation 80%, light 70%. (Model did not react to the empty reservoir; the safety layer did.)']];
+const S=[['temp','Air temp','°C',10,35,.1],['rh','Humidity','%',20,90,1],['soil','Substrate moisture','%',5,60,.1],['co2','CO₂','ppm',400,2000,10],['led','LED temp','°C',25,75,.5],['res','Reservoir','%',0,100,.5]];
+const L={led:60,cap:15,minres:5,maxirr:150};
+let i=0,manual=false,t={},timer;
+const vpd=(T,r)=>+(.61078*Math.exp(17.27*T/(T+237.3))*(1-r/100)).toFixed(3);
+const cl=(x,a,b)=>Math.min(b,Math.max(a,x));
+function heur(s,k){const sm=(k.s[0]+k.s[1])/2,v=vpd(s.temp,s.rh);return{irr:Math.round(cl((sm-s.soil)*2.5,0,150)),light:Math.round(cl(80-Math.max(0,v-k.vpd[1])*20,20,100)),fan:Math.round(cl(40+Math.max(0,v-k.vpd[1])*50+Math.max(0,s.temp-k.t[1])*5,20,100)),rb:4.5,why:'Offline heuristic: irrigation scales with moisture deficit below target midpoint, fan with VPD and temperature excess, light eased when VPD is high.'}}
+function safe(v,s){const o={...v},iv=[];if(s.led>=L.led){o.light=Math.min(o.light,L.cap);iv.push(`LED at ${s.led} °C (limit ${L.led}): light capped at ${L.cap}%`)}
+if(s.res<L.minres){o.irr=0;iv.push(`Reservoir at ${s.res}% (min ${L.minres}%): pump disabled`)}
+if(o.irr>L.maxirr){o.irr=L.maxirr;iv.push(`Irrigation reduced to ${L.maxirr} ml limit`)}return[o,iv]}
+function load(n){i=n;manual=false;S.forEach((s,j)=>t[s[0]]=F[n][j]);render()}
+function build(){$('sl').innerHTML=S.map(s=>`<div class="sl"><label for="s_${s[0]}">${s[1]}<output id="o_${s[0]}"></output></label><input type="range" id="s_${s[0]}" min="${s[3]}" max="${s[4]}" step="${s[5]}"></div>`).join('');
+S.forEach(s=>$('s_'+s[0]).oninput=e=>{t[s[0]]=+e.target.value;manual=true;render()});
+$('fb').innerHTML=F.map((_,n)=>`<button data-n="${n}" aria-label="Frame ${n+1}">${n+1}</button>`).join('');
+$('fb').onclick=e=>{if(e.target.dataset.n){stop();load(+e.target.dataset.n)}};
+$('ch').innerHTML=[['temp','Air temp °C',0],['vpd','VPD kPa',2],['soil','Substrate %',2],['led','LED °C',4],['res','Reservoir %',5],['co2','CO₂ ppm',3]].map(c=>`<div class="ch"><div class="t"><span>${c[1]}</span><b id="v_${c[0]}"></b></div><svg id="c_${c[0]}" viewBox="0 0 300 78" preserveAspectRatio="none"></svg></div>`).join('')}
+function series(k){return F.map(f=>k=='vpd'?vpd(f[0],f[1]):f[{temp:0,soil:2,co2:3,led:4,res:5}[k]])}
+function chart(k,band,lim){const d=series(k),k2=K[$('crop').value];let lo=Math.min(...d,band?band[0]:1e9),hi=Math.max(...d,band?band[1]:-1e9);if(lim!=null){lo=Math.min(lo,lim);hi=Math.max(hi,lim)}const p=(hi-lo)*.1||1;lo-=p;hi+=p;const X=n=>8+n*(284/7),Y=v=>70-(v-lo)/(hi-lo)*62;
+let s='';if(band)s+=`<rect x="0" y="${Y(band[1])}" width="300" height="${Y(band[0])-Y(band[1])}" fill="#10B981" opacity=".18"/>`;
+if(lim!=null)s+=`<line x1="0" x2="300" y1="${Y(lim)}" y2="${Y(lim)}" stroke="#f0566a" stroke-dasharray="4 3"/>`;
+s+=`<polyline fill="none" stroke="#06B6D4" stroke-width="2" points="${d.map((v,n)=>X(n)+','+Y(v)).join(' ')}"/>`;
+s+=d.map((v,n)=>`<circle cx="${X(n)}" cy="${Y(v)}" r="${n==i?5:2.5}" fill="${n==i?'#fff':'#06B6D4'}"/>`).join('');$('c_'+k).innerHTML=s}
+function render(){const k=K[$('crop').value],v=vpd(t.temp,t.rh);
+S.forEach(s=>{$('s_'+s[0]).value=t[s[0]];$('o_'+s[0]).textContent=t[s[0]]+' '+s[2]});
+const out=v<k.vpd[0]||v>k.vpd[1];$('vpd').innerHTML=`VPD <span class="${out?'bad':'ok'}">${v} kPa</span><div style="font:400 13px 'IBM Plex Sans';color:var(--mut)">target ${k.vpd[0]}–${k.vpd[1]}</div>`;
+[...$('fb').children].forEach((b,n)=>b.className=!manual&&n==i?'on':'');
+const rec=!manual&&$('crop').value=='potato',m=M[i],p=rec?{irr:m[0],light:m[1],fan:m[2],rb:m[3],why:m[4]}:heur(t,k),[a,iv]=safe(p,t);
+$('src').textContent=rec?'Recorded gpt-oss-120b decision':'Offline heuristic (not the LLM)';
+const row=(n,u,pr,ap,mx)=>`<div class="vec"><div class="n"><span>${n}</span><b>${pr!=ap?`<s style="color:var(--mut)">${pr}</s> <span class="bad">${ap}</span>`:ap} ${u}</b></div><div class="tr"><div class="a" style="width:${ap/mx*100}%"></div>${pr!=ap?`<div class="p" style="left:${pr/mx*100}%"></div>`:''}</div></div>`;
+$('vec').innerHTML=row('Irrigation','ml',p.irr,a.irr,150)+row('Light intensity','%',p.light,a.light,100)+row('Fan duty','%',p.fan,a.fan,100)+`<div class="vec"><div class="n"><span>Red : blue</span><b>${p.rb} : 1</b></div></div>`;
+$('iv').innerHTML=iv.length?iv.map(x=>`<div class="alert">${x}</div>`).join(''):'<div class="alert safe">No rule fired. Proposal applied unchanged.</div>';
+$('why').textContent=p.why;
+chart('temp',k.t,null);chart('vpd',k.vpd,null);chart('soil',k.s,null);chart('led',null,L.led);chart('res',null,L.minres);chart('co2',null,null);
+$('v_temp').textContent=t.temp;$('v_vpd').textContent=v;$('v_soil').textContent=t.soil;$('v_led').textContent=t.led;$('v_res').textContent=t.res;$('v_co2').textContent=t.co2;
+window.cur={p,a,iv,v,k}}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='▶ Play replay'}
+$('play').onclick=()=>{if(timer)return stop();$('play').textContent='❚❚ Pause';let n=-1;timer=setInterval(()=>{n=(n+1)%8;load(n)},1800)};
+$('crop').onchange=render;
+function say(c,x){const l=$('log');l.insertAdjacentHTML('beforeend',`<p class="${c}">${x}</p>`);l.scrollTop=l.scrollHeight}
+$('cf').onsubmit=e=>{e.preventDefault();const q=$('ci').value.trim().toLowerCase();if(!q)return;say('u',$('ci').value);$('ci').value='';const{a,iv,v,k}=window.cur,w=k.n;let r;
+if(/harvest|ready|when/.test(q))r=`Harvest timing is not modelled in the notebook, so I can’t give a reliable date for the ${w}. I can tell you the current stage targets: VPD ${k.vpd[0]}–${k.vpd[1]} kPa and a DLI of ${k.dli}.`;
+else if(/water|reservoir|irrig/.test(q))r=`Reservoir ${t.res}%, substrate ${t.soil}% (target ${k.s[0]}–${k.s[1]}%). Applied irrigation: ${a.irr} ml.${t.res<L.minres?' Pump is locked out: refill the reservoir.':''}`;
+else if(/vpd|humid/.test(q))r=`VPD is ${v} kPa against a ${k.vpd[0]}–${k.vpd[1]} target, at ${t.temp} °C and ${t.rh}% RH. ${v>k.vpd[1]?'Air is too dry: fan at '+a.fan+'%.':v<k.vpd[0]?'Air is too humid.':'In range.'}`;
+else r=`Status for ${w}: ${t.temp} °C, ${t.rh}% RH, VPD ${v} kPa, substrate ${t.soil}%, CO₂ ${t.co2} ppm. ${iv.length?'Safety layer intervened: '+iv.join('; ')+'.':'All systems nominal.'}`;
+setTimeout(()=>say('',r),250)};
+{const sc=$('scene');if(sc&&!matchMedia('(prefers-reduced-motion:reduce)').matches)addEventListener('pointermove',e=>{const x=e.clientX/innerWidth-.5,y=e.clientY/innerHeight-.5;sc.style.transform=`rotateY(${x*14}deg) rotateX(${-y*10}deg)`;sc.querySelectorAll('[data-d]').forEach(el=>el.style.translate=`${x*el.dataset.d}px ${y*el.dataset.d}px`)})}
+build();load(0);say('','O.A.S.I.S. console ready. Ask about status, water, VPD or harvest.');
+</script></body></html>
