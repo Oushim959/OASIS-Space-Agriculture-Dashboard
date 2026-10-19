@@ -1,0 +1,117 @@
+# O.A.S.I.S. — UI/UX Refinement Brief
+
+Act as a senior product designer and frontend engineer specializing in scientific software, aerospace interfaces, and high-quality data visualization.
+
+Refine the existing O.A.S.I.S. Space Agriculture application into a polished, competition-ready product. O.A.S.I.S. monitors plant conditions using IoT signals and an LLM-powered decision-support system that produces justified recommendations for a command centre.
+
+## Primary objective
+
+Replace the generic AI-generated visual aesthetic with a distinctive, cohesive identity inspired by space-agency instrumentation, controlled-environment agriculture, and biological life-support research.
+
+The product should feel scientifically credible, carefully engineered, and visually memorable.
+
+## Critical implementation constraints
+
+1. Inspect the existing project, routes, components, styles, dependencies, and data flow before making changes.
+2. Preserve all existing working functionality, including navigation, dashboard interactions, plant profiles, sensor charts, model outputs, and project information.
+3. Do not rebuild the application from scratch or replace real functionality with static mockups.
+4. Do not change backend contracts, API interfaces, model configuration, or IoT processing logic unless absolutely necessary and explicitly justified.
+5. Reuse the existing framework, libraries, and components wherever practical.
+6. Make changes incrementally and verify the application after each major section.
+7. Never fabricate live sensor readings, model performance, scientific results, or completed physical actions. Label simulated data clearly.
+
+## Visual direction
+
+Create an aesthetic described as "Orbital Botanical Engineering."
+
+- Deep midnight-navy backgrounds with layered, subtly differentiated surfaces.
+- Restrained emerald or chlorophyll-green accents for healthy states, key actions, and active selections.
+- Off-white primary text and sufficiently bright secondary text for readability.
+- Large, confident editorial typography for the project overview.
+- Compact, precise typography for technical labels and telemetry.
+- Consistent spacing, restrained borders, and fewer nested cards.
+- Subtle botanical diagrams, orbital geometry, sensor traces, and technical annotations.
+- Minimal animation used only to communicate state or add subtle atmosphere.
+- Avoid excessive gradients, glowing borders, gratuitous glassmorphism, generic AI imagery, decorative icons in every card, and unnecessary rounded containers.
+
+Maintain a consistent design system across the overview and operational dashboard. Use CSS variables or the project's existing design-token system for colors, typography, spacing, radii, and shadows.
+
+## Page 1: Project overview
+
+Make the opening screen immediately communicate what O.A.S.I.S. does and why it matters for space agriculture.
+
+Retain the existing project identity and the headline "Life support, rooted." if it fits the current content.
+
+Build a distinctive hero featuring:
+- A clear headline and concise explanatory subheading.
+- A strong botanical or controlled-habitat visual.
+- A primary action to explore the monitoring dashboard.
+- A secondary action to understand the system architecture.
+- A small, truthful system-status indicator if status data is available.
+
+Follow with a visually varied narrative explaining:
+1. The challenge of maintaining plant health in controlled or space-related environments.
+2. The IoT sensing and data-processing pipeline.
+3. The LLM's role in interpreting measurements and generating justified recommendations.
+4. How recommendations reach the command centre for human review or action.
+5. The project's actual implementation, evaluation, and limitations.
+
+Use a clear system-flow diagram instead of another generic row of feature cards.
+
+## Page 2: Monitoring dashboard
+
+Make the interface resemble a professional habitat monitoring station.
+
+Establish this hierarchy:
+
+1. Overall plant or habitat status.
+2. The most important sensor readings, with units and timestamps where available.
+3. A prominent latest AI assessment.
+4. The recommended adjustment and its justification.
+5. Historical trends, individual plant profiles, detailed telemetry, and supporting information.
+
+Use charts that clearly communicate trends and thresholds. Label axes and units. Avoid chart decoration that does not communicate useful information.
+
+Give important states consistent labels and colors. Do not rely on color alone to convey meaning.
+
+Distinguish explicitly between:
+- Raw sensor measurements.
+- Processed, corrected, or interpreted values.
+- AI-generated recommendations.
+- Human approval and execution status.
+
+Only show these distinctions where the existing data model supports them. Never imply that an AI recommendation has physically changed a plant's environment unless the system confirms execution.
+
+Make the dashboard usable at both desktop and mobile widths. Prioritize readability over fitting every widget into the first screen.
+
+## AI assessment component
+
+Design a distinctive assessment panel that makes the intelligence of O.A.S.I.S. visible.
+
+Include, where supported by actual output:
+- Current condition.
+- Key evidence from sensor data.
+- Assessment or recommendation.
+- Explanation of why the recommendation follows from the evidence.
+- Relevant uncertainty or missing information.
+- Human-review status.
+
+Use a clear visual distinction between observed facts and model-generated interpretations.
+
+Do not present an LLM-generated explanation as scientifically validated merely because it sounds convincing.
+
+## Final quality pass
+
+After implementation:
+
+- Check all existing routes and interactions.
+- Confirm that existing data and API integrations still work.
+- Verify responsive behavior at desktop, tablet, and mobile widths.
+- Improve typography, contrast, whitespace, alignment, and visual hierarchy.
+- Remove redundant borders, excessive cards, and unnecessary visual effects.
+- Check empty, loading, error, and unavailable-data states.
+- Ensure the overview and dashboard feel like parts of the same product.
+
+First provide a concise implementation plan identifying the existing components to modify. Then implement the changes in the existing codebase. Summarize the files changed, functionality preserved, and any remaining issues.
+
+Prioritize a few high-impact improvements executed exceptionally well over a large number of superficial visual changes.

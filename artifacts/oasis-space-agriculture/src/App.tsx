@@ -194,8 +194,8 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
   return (
     <>
       <div className="card-top">
-        <div><h4>{config.title}</h4><p>Target window shaded · 15 min sample cadence</p></div>
-        <div className="legend"><span><i style={{ background: config.color }} />series</span><span><i className="cyan-i" />active frame</span></div>
+         <div><h4>{config.title} · {config.unit}</h4><p>Target window shaded · 15 min sample cadence</p></div>
+        <div className="legend"><span><i style={{ background: config.color }} />Recorded value</span><span><i className="target-i" />Profile range</span><span><i className="cyan-i" />Selected frame</span></div>
       </div>
       <div className="chart-area">
         <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${config.title} across eight synthetic telemetry frames. Target ${config.target[0]} to ${config.target[1]} ${config.unit}.`}>
@@ -236,6 +236,13 @@ function AppPage() {
   const [modelError, setModelError] = useState('');
   const sample = frames[frame];
   const vpd = vpdFor(sample.air, sample.rh);
+  const activeProfile = cropData[crop];
+  const profileChecks = [
+    { label: 'Air temperature', value: `${sample.air.toFixed(1)} °C`, range: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, outside: sample.air < activeProfile.air[0] || sample.air > activeProfile.air[1] },
+    { label: 'Substrate moisture', value: `${sample.moisture.toFixed(1)}%`, range: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, outside: sample.moisture < activeProfile.moisture[0] || sample.moisture > activeProfile.moisture[1] },
+    { label: 'Derived VPD', value: `${vpd.toFixed(2)} kPa`, range: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, outside: vpd < activeProfile.vpd[0] || vpd > activeProfile.vpd[1] },
+  ];
+  const outsideProfileCount = profileChecks.filter((check) => check.outside).length;
   const proposedIrrigation = irrigateProposal[frame];
   const proposedLight = lightProposal[frame];
   const appliedIrrigation = sample.reservoir < 5 ? 0 : Math.min(proposedIrrigation, 150);
@@ -395,10 +402,26 @@ function AppPage() {
                 </div>
               </div>
               <div className="dash-body">
-                <div className="demo-notice">
+                  <div className="demo-notice">
                   <span><strong>SYNTHETIC REPLAY</strong> · 8 frames, 15 minutes apart · 2026-10-12 00:00–01:45 · not live sensor data</span>
                   <span className="demo-stamp">FRAME {String(frame + 1).padStart(2, '0')} / 08 &nbsp; · &nbsp; {formatTime(frame)}</span>
                 </div>
+                <section className="assessment-panel" aria-live="polite" aria-label="Rules-based crop profile assessment">
+                  <div className="assessment-summary">
+                    <div className="eyebrow">Frame assessment · rules-based</div>
+                    <h3>{outsideProfileCount === 0 ? 'Within configured profile ranges' : `${outsideProfileCount} of 3 readings outside profile range`}</h3>
+                    <p>Comparison against the selected {activeProfile.name.toLowerCase()} profile. This is not an AI diagnosis or a plant-safety determination.</p>
+                  </div>
+                  <div className="assessment-evidence">
+                    {profileChecks.map((check) => (
+                      <div className="evidence-row" key={check.label}>
+                        <span>{check.label}</span>
+                        <b>{check.value}</b>
+                        <span className={check.outside ? 'evidence-state outside' : 'evidence-state'}>{check.outside ? 'Outside' : 'Within'} · target {check.range}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
                 <div className="telemetry-grid">
                   <div className="surface metric"><div className="metric-top"><span>AIR TEMP</span><Thermometer size={13} /></div><div className="metric-value">{sample.air.toFixed(1)}<small> °C</small></div><div className={`metric-status ${sample.air < cropData[crop].air[0] || sample.air > cropData[crop].air[1] ? 'warn' : ''}`}>{sample.air >= cropData[crop].air[0] && sample.air <= cropData[crop].air[1] ? 'IN PROFILE RANGE' : 'OUTSIDE PROFILE'}</div></div>
                   <div className="surface metric"><div className="metric-top"><span>REL. HUMIDITY</span><Waves size={13} /></div><div className="metric-value">{sample.rh}<small> %</small></div><div className="metric-status">SENSOR INPUT</div></div>
@@ -422,26 +445,26 @@ function AppPage() {
                     <div className="frame-times">{frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
                   </div>
                   <div className="surface controls-card">
-                    <div className="card-top"><div><h4>Control proposal / applied</h4><p>Replay output · deterministic validation</p></div><ClipboardList size={15} color="#62d8ed" /></div>
-                    <div className="column-head"><span /><span className="control-column-label">Proposed</span><span className="control-column-label">Applied</span></div>
+                      <div className="card-top"><div><h4>Control proposal / rule decision</h4><p>Recorded proposal · deterministic replay only</p></div><ClipboardList size={15} color="#62d8ed" /></div>
+                    <div className="column-head"><span /><span className="control-column-label">Proposed</span><span className="control-column-label">Permitted*</span></div>
                     <div className="control-row"><span className="control-name">Irrigation</span><span className="control-val proposed">{proposedIrrigation} ml</span><span className="control-val applied">{appliedIrrigation} ml</span></div>
                      <div className="control-row"><span className="control-name">R:B (from rationale)</span><span className="control-val proposed">~{redBlueProposal[frame]} : 1</span><span className="control-val applied">~{redBlueProposal[frame]} : 1</span></div>
                     <div className="control-row"><span className="control-name">Light intensity</span><span className="control-val proposed">{lightProposal[frame]}%</span><span className="control-val applied">{appliedLight}%</span></div>
                     <div className="control-row"><span className="control-name">Fan duty</span><span className="control-val proposed">{fanProposal[frame]}%</span><span className="control-val applied">{fanProposal[frame]}%</span></div>
                     {interventions.length > 0 ? (
-                      <div className="rule-alert"><AlertTriangle size={14} /><span><strong>Rule intervention</strong><br />{interventions.join(' · ')}</span></div>
+                      <div className="rule-alert"><AlertTriangle size={14} /><span><strong>Rule adjustment in replay</strong><br />{interventions.join(' · ')}</span></div>
                     ) : (
                       <div className="rule-alert safe"><Check size={14} /><span>No configured rule intervened in this frame. This is not a guarantee of overall plant safety.</span></div>
                     )}
                   </div>
                 </div>
                 <div className="surface event-log" aria-live="polite">
-                  <div className="event-log-head"><h4>Safety event log</h4><span>{interventions.length} INTERVENTION{interventions.length === 1 ? '' : 'S'} · FRAME {frame + 1}</span></div>
+                  <div className="event-log-head"><h4>Rule decisions · replay only</h4><span>{interventions.length} ADJUSTMENT{interventions.length === 1 ? '' : 'S'} · FRAME {frame + 1}</span></div>
                   {interventions.length ? interventions.map((text) => (
-                    <div className="log-entry" key={text}><span className="log-time">{formatTime(frame)}</span><span className="log-mark warn" /><span>{text}</span><span className="log-result">APPLIED</span></div>
+                    <div className="log-entry" key={text}><span className="log-time">{formatTime(frame)}</span><span className="log-mark warn" /><span>{text}</span><span className="log-result">RULE-ADJUSTED</span></div>
                   )) : <div className="log-entry"><span className="log-time">{formatTime(frame)}</span><span className="log-mark" /><span>No configured deterministic safeguard fired.</span><span className="log-result">UNCHANGED</span></div>}
                 </div>
-                  <div className="dash-foot">VPD = 0.61078 × exp(17.27 × T / (T + 237.3)) × (1 − RH/100). Sensor frames are synthetic; recorded controller values are from the notebook’s potato tuber-bulking run. R:B ratios are approximate estimates from model reasoning. No LLM is running on this page, and no live sensing or actuator integration is active.</div>
+                  <div className="dash-foot">*“Permitted” means the value remains after the demo’s deterministic checks; nothing is sent to hardware. VPD = 0.61078 × exp(17.27 × T / (T + 237.3)) × (1 − RH/100). Sensor frames are synthetic; recorded controller values are from the notebook’s potato tuber-bulking run. R:B ratios are approximate estimates from model reasoning. No LLM is running on this page, and no live sensing or actuator integration is active.</div>
               </div>
             </div>
           </div>
