@@ -346,8 +346,6 @@ const arJournal: Record<string, string> = {
   'Estimate vapor-pressure deficit from temperature and relative humidity.': 'تقدير عجز ضغط البخار من درجة الحرارة والرطوبة النسبية.',
   'Recorded model output suggests irrigation, light, fan duty and rationale.': 'تقترح مخرجات النموذج المسجلة الري والإضاءة وتشغيل المروحة ومبررات ذلك.',
   'Plain rules cap or block selected outputs. Each adjustment stays visible.': 'تضع القواعد الواضحة حداً لبعض المخرجات أو تمنعها. ويظل كل تعديل ظاهراً.',
-  'Offline replay only.': 'إعادة تشغيل محلية فقط.',
-  'This site has no live sensors, model calls, API connection, human approval flow or actuator commands.': 'لا يتضمن هذا الموقع حساسات حية أو اتصالات بالنموذج أو API أو موافقات بشرية أو أوامر للمشغلات.',
   '04 / Crop profiles': '٠٤ / ملفات المحاصيل',
   'Two plants. Two different needs.': 'نباتان، واحتياجان مختلفان.',
   'Targets below are notebook profile values, not universal growing advice. A real mission system needs validation by cultivar, medium and growth phase.': 'الأهداف أدناه قيم لملفات الدفتر وليست نصائح زراعية عامة. يحتاج نظام المهمة الفعلي إلى تحقق بحسب الصنف والوسط ومرحلة النمو.',
@@ -360,7 +358,7 @@ const arJournal: Record<string, string> = {
   'Concept connections, not a build claim.': 'تصور للترابط، لا ادعاء بوجود بناء.',
   'Choose a self-contained .glb or .gltf file to inspect it locally. The file remains in this browser; nothing is uploaded.': 'اختر ملف ‎.glb أو ‎.gltf مكتفياً ذاتياً لمعاينته محلياً. يبقى الملف في هذا المتصفح ولا يُرفع.',
   'A .gltf file must embed its resources. A self-contained .glb is recommended.': 'يجب أن يضم ملف ‎.gltf موارده. نوصي بملف ‎.glb مكتفٍ ذاتياً.',
-  '06 / Boundaries & event credits': '٠٦ / حدود السلامة واعتمادات الفعالية',
+  '06 / Boundaries': '٠٦ / حدود السلامة',
   'Clear rules. Clear limits.': 'قواعد واضحة. وحدود واضحة.',
   'The displayed rules address three explicit conditions: a thermal cap, a low-reservoir interlock and a per-event irrigation limit.': 'تعالج القواعد المعروضة ثلاث حالات محددة: حدّاً حرارياً، وقفل انخفاض مستوى الخزان، وحداً لكمية الري في كل مرة.',
   'LED thermal cap': 'حد حرارة LED',
@@ -371,8 +369,6 @@ const arJournal: Record<string, string> = {
   'A proposed irrigation event above 150 ml is capped at 150 ml.': 'إذا تجاوزت كمية الري المقترحة ١٥٠ مل، تُحدد عند ١٥٠ مل.',
   'What the replay can—and cannot—say': 'ما الذي توضحه الإعادة وما لا توضحه',
   'The page replays eight synthetic notebook frames. Only potato has a recorded run; tomato shows its configured profile without borrowed readings. No live sensors, model calls, approval flow or actuator commands are connected.': 'تعيد الصفحة تشغيل ثمانية إطارات اصطناعية من الدفتر. للبطاطس قراءة مسجلة فقط؛ أما الطماطم فتُعرض بملفها المُعد دون استعارة قراءات. لا توجد حساسات حية أو اتصالات بالنموذج أو موافقات أو أوامر للمشغلات.',
-  'Event organizers & sponsors': 'منظمو الفعالية والجهات الراعية',
-  'The supplied event poster identifies the Boeing Space Lead Hackathon Competition 2026 at Alfaisal University, 25–26 October 2026. It does not confirm organizer or sponsor roles, so names and marks are held until verified.': 'تُعرّف نشرة الفعالية المسابقة باسم Boeing Space Lead Hackathon Competition 2026 في جامعة الفيصل خلال 25–26 أكتوبر 2026. لكنها لا تؤكد أدوار الجهات المنظمة أو الراعية، لذلك لن تُعرض الأسماء أو الشعارات قبل التحقق.',
   'Tend the loop.': 'اعتنِ بالدورة.',
   'See the crop, the recorded frame and the rule outcome—without mistaking replay for live control.': 'شاهد المحصول والإطار المسجل ونتيجة القاعدة، دون الخلط بين الإعادة والتحكم المباشر.',
   'Open the offline dashboard': 'افتح لوحة البيانات المحلية',
@@ -704,7 +700,6 @@ function AppPage() {
               <article><span>03</span><Lightbulb size={20} /><h3>Propose</h3><p>Recorded model output suggests irrigation, light, fan duty and rationale.</p></article>
               <article><span>04</span><ShieldCheck size={20} /><h3>Review</h3><p>Plain rules cap or block selected outputs. Each adjustment stays visible.</p></article>
             </div>
-            <div className="truth-note"><ShieldCheck size={18} /><p><strong>Offline replay only.</strong> This site has no live sensors, model calls, API connection, human approval flow or actuator commands.</p></div>
           </div>
         </section>
         </>}
@@ -948,7 +943,7 @@ function AppPage() {
         <section id="safeguards" className="journal-section accordion-section">
           <div className="section-shell accordion-layout">
             <div className="accordion-intro">
-              <div className="eyebrow">06 / Boundaries &amp; event credits</div>
+              <div className="eyebrow">06 / Boundaries</div>
               <h2 className="display">Clear rules. Clear limits.</h2>
               <p>The displayed rules address three explicit conditions: a thermal cap, a low-reservoir interlock and a per-event irrigation limit.</p>
             </div>
@@ -968,10 +963,6 @@ function AppPage() {
               <details className="journal-accordion">
                 <summary><span className="accordion-number">04</span><span>What the replay can—and cannot—say</span><span className="accordion-symbol" aria-hidden="true" /></summary>
                 <div className="accordion-body"><p>The page replays eight synthetic notebook frames. Only potato has a recorded run; tomato shows its configured profile without borrowed readings. No live sensors, model calls, approval flow or actuator commands are connected.</p></div>
-              </details>
-              <details id="credits" className="journal-accordion">
-                <summary><span className="accordion-number">05</span><span>Event organizers &amp; sponsors</span><span className="accordion-symbol" aria-hidden="true" /></summary>
-                <div className="accordion-body"><p>The supplied event poster identifies the Boeing Space Lead Hackathon Competition 2026 at Alfaisal University, 25–26 October 2026. It does not confirm organizer or sponsor roles, so names and marks are held until verified.</p></div>
               </details>
             </div>
           </div>
