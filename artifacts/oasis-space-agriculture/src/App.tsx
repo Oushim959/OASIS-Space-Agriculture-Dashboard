@@ -180,10 +180,10 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
     metric === 'moisture' ? f.moisture : metric === 'air' ? f.air : vpdFor(f.air, f.rh),
   ), [metric]);
   const config = metric === 'moisture'
-    ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#73d19a', unit: '%', title: 'Substrate moisture' }
+    ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#93c982', unit: '%', title: 'Substrate moisture' }
     : metric === 'air'
-      ? { min: 10, max: 32, target: cropData[crop].air, color: '#f0a36b', unit: '°C', title: 'Air temperature' }
-      : { min: 0, max: 2.2, target: cropData[crop].vpd, color: '#70bdea', unit: 'kPa', title: 'Derived VPD' };
+      ? { min: 10, max: 32, target: cropData[crop].air, color: '#e0a56d', unit: '°C', title: 'Air temperature' }
+      : { min: 0, max: 2.2, target: cropData[crop].vpd, color: '#75bcd6', unit: 'kPa', title: 'Derived VPD' };
   const W = 600, H = 225, padL = 36, padR = 12, padT = 12, padB = 28;
   const x = (i: number) => padL + (i * (W - padL - padR)) / 7;
   const y = (v: number) => padT + ((config.max - v) / (config.max - config.min)) * (H - padT - padB);

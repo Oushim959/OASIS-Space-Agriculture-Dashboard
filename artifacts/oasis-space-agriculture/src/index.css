@@ -638,25 +638,25 @@ a { color: inherit; text-decoration: none; }
   background: transparent;
 }
 .signal-card:last-child { border-right: 0; }
-.signal-temperature { --signal: #d59b6d; background: transparent; }
-.signal-moisture { --signal: #a2c091; background: transparent; }
-.signal-vpd { --signal: #8eb7c1; background: transparent; }
+.signal-temperature { --signal: #e0a56d; background: transparent; }
+.signal-moisture { --signal: #93c982; background: transparent; }
+.signal-vpd { --signal: #75bcd6; background: transparent; }
 .signal-card-head {
   color: #c4d0c3;
   font-size: 13px;
   font-weight: 500;
 }
-.signal-card-head i { width: 8px; height: 8px; border-width: 1px; background: transparent; }
+.signal-card-head i { width: 9px; height: 9px; border: 0; background: var(--signal); }
 .signal-value {
   margin: 16px 0 7px;
-  color: #eef2e9;
+  color: var(--signal);
   font-size: 34px;
   letter-spacing: -.055em;
 }
-.signal-value small { color: #bec9bc; font-size: 15px; font-weight: 400; }
+.signal-value small { color: var(--signal); font-size: 15px; font-weight: 500; opacity: .92; }
 .signal-target { color: var(--dash-muted); font-size: 13px; }
-.signal-target b { color: #d9e2d5; font-weight: 500; }
-.signal-state { margin-top: 10px; color: #a9c79c; font-size: 13px; font-weight: 500; }
+.signal-target b { color: var(--signal); font-weight: 600; }
+.signal-state { margin-top: 10px; color: var(--signal); font-size: 13px; font-weight: 600; }
 .signal-state.outside { color: #dda779; }
 .secondary-readings, .technical-details {
   margin: 20px 0 30px;
@@ -676,11 +676,11 @@ a { color: inherit; text-decoration: none; }
 .secondary-grid { gap: 10px 24px; padding: 4px 0 18px; }
 .secondary-reading { color: #c0cdc0; font-size: 13px; }
 .secondary-reading b { color: #e4ece1; font-size: 15px; }
-.secondary-marker { width: 6px; height: 6px; background: #a2c091; }
-.secondary-humidity .secondary-marker { background: #8eb7c1; }
-.secondary-co2 .secondary-marker { background: #c4aa81; }
-.secondary-led .secondary-marker { background: #d59b6d; }
-.secondary-reservoir .secondary-marker { background: #9db89f; }
+.secondary-marker { width: 8px; height: 8px; background: #93c982; }
+.secondary-humidity .secondary-marker { background: #75bcd6; }
+.secondary-co2 .secondary-marker { background: #b99be0; }
+.secondary-led .secondary-marker { background: #e0a56d; }
+.secondary-reservoir .secondary-marker { background: #6fc9bb; }
 .dashboard-insights {
   grid-template-columns: minmax(0, .78fr) minmax(0, 1.22fr);
   gap: 46px;
