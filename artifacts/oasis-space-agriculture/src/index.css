@@ -119,12 +119,12 @@ img { display: block; max-width: 100%; }
 
 .site-header { position: sticky; z-index: 20; top: 0; background: rgba(246,240,223,.92); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .nav-inner { height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.brand { display: flex; gap: 12px; align-items: center; }
-.brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: var(--lime); background: var(--forest); transition: transform .4s; }
-.brand:hover .brand-mark { transform: rotate(-12deg) scale(1.05); }
-.brand-mark svg { width: 26px; height: 26px; }
-.brand-word { display: block; font: 700 19px/1 var(--app-font-serif); letter-spacing: .06em; color: var(--forest); }
-.brand-sub { display: block; margin-top: 4px; color: var(--ink-2); font: 12px/1.15 var(--app-font-mono); letter-spacing: .1em; }
+.brand { display: flex; flex: 0 0 auto; gap: 12px; align-items: center; }
+.brand-emblem { width: 50px; height: 50px; flex: 0 0 auto; object-fit: contain; transition: transform .25s; }
+.brand:hover .brand-emblem { transform: scale(1.04); }
+.brand-copy { display: block; }
+.brand-word { display: block; color: #17334b; font: 700 18px/1 var(--app-font-sans); letter-spacing: .08em; }
+.brand-sub { display: block; margin-top: 5px; color: #17334b; font: 600 12px/1.15 var(--app-font-sans); letter-spacing: .035em; }
 .nav-links { display: flex; align-items: center; gap: 4px; font-size: 16px; font-weight: 500; }
 .nav-links a { padding: 8px 14px; border-radius: 99px; color: var(--ink-2); transition: background .2s, color .2s; }
 .nav-links a:hover { background: rgba(79,143,58,.14); color: var(--forest); }
@@ -466,7 +466,6 @@ img { display: block; max-width: 100%; }
   .dashboard-actions { flex-direction: column; align-items: stretch; width: 100%; }
   .plant-tab { flex: 1; padding: 8px 14px; }
   .secondary-grid { grid-template-columns: 1fr; }
-  .brand-sub { display: none; }
   .hero-facts { gap: 22px; }
   .metric-picker { width: 100%; justify-content: space-between; }
   .history-section { padding: 20px 14px; }
@@ -617,7 +616,6 @@ img { display: block; max-width: 100%; }
   filter: drop-shadow(0 20px 15px rgba(47, 73, 43, .13));
   animation: plant-arrive .75s both cubic-bezier(.2,.7,.2,1);
 }
-#dashboard .plant-portrait.crop-tomato img { max-width: 455px; }
 #dashboard .plant-portrait figcaption {
   position: absolute;
   right: 0;
@@ -780,6 +778,14 @@ img { display: block; max-width: 100%; }
 #dashboard .rule-event b { font-size: 14px; }
 #dashboard .proposal-empty, #dashboard .chart-unavailable { font-size: 16px; }
 #dashboard .chart-unavailable { background: rgba(227, 235, 215, .3); border-radius: 12px; }
+#dashboard .history-plot .chart-unavailable {
+  display: grid;
+  min-height: 225px;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+}
+#dashboard .timeline-unavailable input { cursor: not-allowed; }
 #dashboard .axis-label { font-size: 13px; }
 #dashboard .frame-times { font-size: 13px; }
 
@@ -814,7 +820,6 @@ img { display: block; max-width: 100%; }
     margin: -2px 0 8px;
   }
   #dashboard .plant-portrait img { height: 330px; max-width: 360px; }
-  #dashboard .plant-portrait.crop-tomato img { max-width: 370px; }
   #dashboard .portrait-halo { width: min(86%, 310px); }
   #dashboard .plant-portrait figcaption { bottom: -3px; }
   #dashboard .primary-readings { order: 2; }

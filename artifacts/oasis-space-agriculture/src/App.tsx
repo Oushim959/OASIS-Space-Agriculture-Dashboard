@@ -48,17 +48,6 @@ const cropData = {
 };
 type CropKey = keyof typeof cropData;
 
-function LogoMark() {
-  return (
-    <svg viewBox="0 0 36 36" width="24" height="24" aria-hidden="true">
-      <circle cx="18" cy="18" r="12.2" fill="none" stroke="currentColor" strokeWidth="1.1" opacity=".7" />
-      <ellipse cx="18" cy="18" rx="5.1" ry="12.2" fill="none" stroke="currentColor" strokeWidth="1.1" />
-      <path d="M5.8 18h24.4M18 5.8c-3.2 3-4.7 7.1-4.7 12.2S14.8 27.2 18 30.2M18 5.8c3.2 3 4.7 7.1 4.7 12.2S21.2 27.2 18 30.2" fill="none" stroke="currentColor" strokeWidth="1" />
-      <path d="M18 13.4c-4.2 1.1-5.3 4.3-4.1 7.8 3.9-.3 6-2.5 5.1-6.2M18.7 21.2c1.2-2.1 2.5-3.3 4-4.1" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function CropPlant({ crop }: { crop: CropKey }) {
   const leaf = (cx: number, cy: number, r: number, c = '#4f8f3a') => <ellipse cx={cx} cy={cy} rx="15" ry="6.5" fill={c} transform={`rotate(${r} ${cx} ${cy})`} />;
   if (crop === 'potato') {
@@ -217,9 +206,12 @@ function AppPage() {
     <div className="oasis-app">
       <header className="site-header">
         <div className="shell nav-inner">
-          <Link className="brand" href="/" aria-label="O.A.S.I.S. home">
-            <span className="brand-mark"><LogoMark /></span>
-            <span><span className="brand-word">O.A.S.I.S.</span><span className="brand-sub">PLANT GROWTH SYSTEMS</span></span>
+          <Link className="brand" href="/" aria-label="O.A.S.I.S. — Orbital Adaptive Smart Irrigation and Sustenance home">
+            <img className="brand-emblem" src="/images/oasis-logo-mark.png" alt="" />
+            <span className="brand-copy">
+              <span className="brand-word">O.A.S.I.S.</span>
+              <span className="brand-sub">ORBITAL ADAPTIVE SMART<br />IRRIGATION &amp; SUSTENANCE</span>
+            </span>
           </Link>
           <nav className={`nav-links ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
             <a href="/#mission" onClick={() => setMenuOpen(false)}>Mission</a>
@@ -341,8 +333,8 @@ function AppPage() {
                 </div>
                 <p className="range-explainer">{hasReplayData ? 'Three measured or derived signals compared with this crop profile.' : 'Targets are configured; no tomato sensor run is available.'}</p>
                 <div className="botanical-meta">
-                  <span className="data-mode">OFFLINE NOTEBOOK</span>
-                  {hasReplayData && <span className="frame-readout">FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></span>}
+                  <span className="data-mode">{hasReplayData ? 'OFFLINE NOTEBOOK' : 'PROFILE ONLY · NO RUN'}</span>
+                  <span className="frame-readout">{hasReplayData ? <>FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></> : 'NO REPLAY FRAME'}</span>
                 </div>
                 <div className="stage-note"><span className="stage-note-rule" />Fresh food is part of life support.</div>
               </div>
@@ -366,7 +358,7 @@ function AppPage() {
                   ].map((signal) => (
                     <article className={`signal-card signal-${signal.key}`} key={signal.key}>
                       <div className="signal-card-head"><span>{signal.label}</span><i aria-hidden="true" /></div>
-                      <div className="signal-value">{signal.value}<small>{hasReplayData ? signal.unit : ''}</small></div>
+                      <div className="signal-value">{signal.value}<small>{signal.unit}</small></div>
                       <div className="gauge" aria-hidden="true"><span className="gauge-band" style={{ left: `${(signal.rng[0] - signal.min) / (signal.max - signal.min) * 100}%`, width: `${(signal.rng[1] - signal.rng[0]) / (signal.max - signal.min) * 100}%` }} />{hasReplayData && <span className="gauge-dot" style={{ left: `${Math.min(100, Math.max(0, (signal.raw - signal.min) / (signal.max - signal.min) * 100))}%` }} />}</div>
                       <div className="signal-target"><span>Profile range</span><b>{signal.target}</b></div>
                       <div className={`signal-state ${signal.outside ? 'outside' : ''}`}>{signal.cue}</div>
@@ -392,12 +384,10 @@ function AppPage() {
 
             <section className="proposal-panel" aria-labelledby="proposal-title">
               <div className="insight-heading">
-                <div><span className="section-index">02</span><h3 id="proposal-title">Recorded control proposal</h3></div>
-                {hasReplayData && <span className="proposal-source">Potato · offline notebook replay</span>}
+                <div><span className="section-index">02</span><h3 id="proposal-title">Model-to-control pipeline</h3></div>
+                <span className="proposal-source">{hasReplayData ? 'Potato · offline notebook replay' : 'Dwarf tomato · profile only'}</span>
               </div>
-              {hasReplayData ? <>
-                <p className="proposal-intro">Stored notebook output for this frame; no live LLM call.</p>
-              </> : <p className="proposal-intro">No recorded sensor run or model output exists for this crop.</p>}
+              <p className="proposal-intro">{hasReplayData ? 'Stored notebook output for this frame; no live LLM call.' : 'No recorded sensor run or model output exists for this crop.'}</p>
               <div className={`pipeline-track ${hasReplayData ? 'has-run' : 'no-run'}`} aria-label="Readings to hardware pipeline">
                 {[
                   { label: 'Sensor snapshot', status: hasReplayData ? `Frame ${String(frame + 1).padStart(2, '0')}` : 'No run recorded' },
@@ -413,35 +403,33 @@ function AppPage() {
                   </div>
                 ))}
               </div>
-              {hasReplayData ? <>
-                <table className="proposal-table">
-                  <thead><tr><th scope="col">Control</th><th scope="col">Recorded proposal</th><th scope="col">Deterministic rule result</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row">Irrigation volume</th><td>{proposedIrrigation} ml</td><td>{permittedIrrigation} ml</td></tr>
-                    <tr><th scope="row">Light intensity</th><td>{proposedLight}%</td><td>{permittedLight}%</td></tr>
-                    <tr><th scope="row">Red : blue ratio</th><td>~{redBlueProposal[frame]} : 1</td><td className="not-rule-checked">Not checked</td></tr>
-                    <tr><th scope="row">Fan duty</th><td>{fanProposal[frame]}%</td><td className="not-rule-checked">Not checked</td></tr>
-                  </tbody>
-                </table>
-                <div className="proposal-key"><span><i className="key-recorded" />Recorded proposal</span><span><i className="key-checked" />Rule-checked result</span><span><i className="key-unchecked" />No rule applied</span></div>
-              </> : null}
+              <table className="proposal-table">
+                <thead><tr><th scope="col">Control</th><th scope="col">Recorded proposal</th><th scope="col">Deterministic rule result</th></tr></thead>
+                <tbody>
+                  <tr><th scope="row">Irrigation volume</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${proposedIrrigation} ml` : 'Not recorded'}</td><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${permittedIrrigation} ml` : 'Not run'}</td></tr>
+                  <tr><th scope="row">Light intensity</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${proposedLight}%` : 'Not recorded'}</td><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${permittedLight}%` : 'Not run'}</td></tr>
+                  <tr><th scope="row">Red : blue ratio</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `~${redBlueProposal[frame]} : 1` : 'Not recorded'}</td><td className="not-rule-checked">{hasReplayData ? 'Not checked' : 'Not run'}</td></tr>
+                  <tr><th scope="row">Fan duty</th><td className={!hasReplayData ? 'not-rule-checked' : undefined}>{hasReplayData ? `${fanProposal[frame]}%` : 'Not recorded'}</td><td className="not-rule-checked">{hasReplayData ? 'Not checked' : 'Not run'}</td></tr>
+                </tbody>
+              </table>
+              <div className="proposal-key"><span><i className="key-recorded" />Recorded proposal</span><span><i className="key-checked" />Rule-checked result</span><span><i className="key-unchecked" />No rule applied</span></div>
             </section>
 
             <section className="history-section" aria-labelledby="history-title">
               <div className="history-heading">
-                <div><span className="section-index">03</span><h3 id="history-title">Signal history</h3><p>Potato notebook replay · 12 Oct 2026 · 15-minute samples</p></div>
+                <div><span className="section-index">03</span><h3 id="history-title">Signal history</h3><p>{hasReplayData ? 'Potato notebook replay · 12 Oct 2026 · 15-minute samples' : 'Dwarf tomato profile · no telemetry run recorded'}</p></div>
                 <label className="metric-picker"><span>Signal</span><select id="metric-select" className="select-control" disabled={!hasReplayData} value={metric} onChange={(event) => setMetric(event.target.value as MetricKey)}>
                   <option value="moisture">Substrate moisture</option><option value="air">Air temperature</option><option value="vpd">Derived VPD</option>
                 </select></label>
               </div>
-              {hasReplayData ? <>
-                <div className="history-plot"><TelemetryChart metric={metric} crop={crop} activeFrame={frame} /></div>
-                <div className="history-timeline">
-                  <div className="timeline-label"><label htmlFor="frame-range">Replay position</label><span>{formatTime(frame)} · frame {frame + 1} of {frames.length}</span></div>
-                  <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max="7" step="1" value={frame} onChange={(event) => setFrame(Number(event.target.value))} />
-                  <div className="frame-times">{frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
-                </div>
-              </> : <div className="chart-unavailable">No dwarf tomato sensor run or history is available.</div>}
+              <div className="history-plot">
+                {hasReplayData ? <TelemetryChart metric={metric} crop={crop} activeFrame={frame} /> : <div className="chart-unavailable">No dwarf tomato sensor run or history is available.</div>}
+              </div>
+              <div className={`history-timeline ${!hasReplayData ? 'timeline-unavailable' : ''}`}>
+                <div className="timeline-label"><label htmlFor="frame-range">Replay position</label><span>{hasReplayData ? `${formatTime(frame)} · frame ${frame + 1} of ${frames.length}` : 'No samples recorded'}</span></div>
+                <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max={hasReplayData ? frames.length - 1 : 0} step="1" value={hasReplayData ? frame : 0} disabled={!hasReplayData} onChange={(event) => setFrame(Number(event.target.value))} />
+                <div className="frame-times">{hasReplayData && frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
+              </div>
             </section>
 
             <details className="technical-details">
