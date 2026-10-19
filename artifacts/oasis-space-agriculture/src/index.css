@@ -1233,6 +1233,31 @@ html[dir="rtl"] .hero-image figcaption { direction: rtl; }
 .journal-footer-links a:hover { text-decoration: underline; text-underline-offset: 4px; }
 .footer-disclaimer { grid-column: 1/-1; padding-top: 11px; border-top: 1px solid rgba(43, 71, 55, .18); color: #617269; font: 13px var(--app-font-mono); letter-spacing: .04em; }
 .field-journal .footer { display: none; }
+.partners-section { background: #e8ebdc; }
+.partners-heading { margin-top: 14px; }
+.partner-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.partner-card {
+  display: flex;
+  min-width: 0;
+  min-height: 188px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 17px 20px 15px;
+  border: 1px solid var(--journal-rule);
+  background: #f7f4eb;
+}
+.partner-mark { display: grid; width: 100%; height: 112px; place-items: center; }
+.partner-mark img { display: block; max-width: 88%; max-height: 88px; object-fit: contain; }
+.partner-mark-mewa img { max-width: 100%; max-height: 74px; }
+.partner-mark-alfaisal img { max-width: min(100%, 230px); max-height: 88px; }
+.partner-mark-stc img { max-width: 92px; max-height: 92px; }
+.partner-mark-ssa img { max-width: min(100%, 230px); max-height: 94px; }
+.partner-mark-mishkat img { max-width: min(100%, 180px); max-height: 104px; }
+.partner-mark-boeing img { max-width: min(100%, 230px); max-height: 76px; }
+.partner-card figcaption { color: var(--journal-ink); font-size: 15px; line-height: 1.35; text-align: center; }
 
 html.dark .field-journal {
   --frame-teal: #344e49;
@@ -1257,6 +1282,9 @@ html.dark .field-journal .model-editorial-panel .model-status { color: #e8eadf; 
 html.dark .field-journal .journal-footer { background: #303b32; color: #e2e8d8; }
 html.dark .field-journal .journal-footer-brand small,
 html.dark .field-journal .footer-disclaimer { color: #bac6b6; }
+html.dark .field-journal .partners-section { background: #303c32; }
+html.dark .field-journal .partner-card { background: #f7f4eb; }
+html.dark .field-journal .partner-card figcaption { color: #24382d; }
 html.dark .field-journal .profile-values span { color: #bdc7b8; }
 html.dark .field-journal .crop-medium { color: #c2d0b8; }
 html.dark .field-journal .journal-section .eyebrow { color: #a9c294; }
@@ -1309,6 +1337,7 @@ html[dir="rtl"] .field-journal .mission-note blockquote { border-right: 0; }
   .field-journal .hero { min-height: min(790px, calc(100svh - 20px)); padding-inline: 28px; }
   .field-journal .hero-title { font-size: clamp(70px, 13vw, 118px); }
   .section-shell { padding-inline: 34px; }
+  .partner-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .mission-intro, .section-heading-row { grid-template-columns: 1fr 1fr; gap: 30px; }
   .constraint-mosaic { grid-template-rows: repeat(3, 190px); }
   .constraint-water { min-height: 590px; }
@@ -1335,6 +1364,10 @@ html[dir="rtl"] .field-journal .mission-note blockquote { border-right: 0; }
   .field-journal .hero { min-height: 740px; min-height: min(790px, calc(100svh - 14px)); padding: 132px 20px 78px; }
   .field-journal .hero-art img { object-position: 52% center; }
   .field-journal .hero-mark { margin-bottom: 30px; font-size: 14px; }
+  .partner-card { min-height: 174px; padding: 13px 10px 12px; }
+  .partner-mark { height: 98px; }
+  .partner-mark-mewa img { max-height: 66px; }
+  .partner-card figcaption { font-size: 14px; }
   .field-journal .hero-title { margin-block: 20px 15px; font-size: clamp(63px, 16vw, 98px); }
   .field-journal .hero-title span:last-child { font-size: .72em; }
   .field-journal .hero-copy > p { max-width: 410px; font-size: 16px; }

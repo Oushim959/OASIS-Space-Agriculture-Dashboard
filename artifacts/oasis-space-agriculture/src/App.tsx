@@ -302,7 +302,7 @@ const arJournal: Record<string, string> = {
   'Crop profiles': 'ملفات المحاصيل',
   'Decision chain': 'تسلسل القرار',
   'Safeguards': 'الضوابط',
-  Credits: 'الإشادات',
+  Sponsors: 'الرعاة',
   'Plant-first habitat concept': 'مفهوم موئل يبدأ بالنبات',
   'Food,': 'الغذاء،',
   'beyond Earth.': 'خارج الأرض.',
@@ -359,6 +359,15 @@ const arJournal: Record<string, string> = {
   'Choose a self-contained .glb or .gltf file to inspect it locally. The file remains in this browser; nothing is uploaded.': 'اختر ملف ‎.glb أو ‎.gltf مكتفياً ذاتياً لمعاينته محلياً. يبقى الملف في هذا المتصفح ولا يُرفع.',
   'A .gltf file must embed its resources. A self-contained .glb is recommended.': 'يجب أن يضم ملف ‎.gltf موارده. نوصي بملف ‎.glb مكتفٍ ذاتياً.',
   '06 / Boundaries': '٠٦ / حدود السلامة',
+  '07 / Supporting organizations': '٠٧ / الجهات الداعمة',
+  'Sponsors & partners': 'الرعاة والشركاء',
+  'Organizations supporting the Space Lead 2026 challenge.': 'الجهات الداعمة لتحدي Space Lead 2026.',
+  'Ministry of Environment, Water & Agriculture': 'وزارة البيئة والمياه والزراعة',
+  'Alfaisal University': 'جامعة الفيصل',
+  'stc': 'stc',
+  'Saudi Space Agency': 'وكالة الفضاء السعودية',
+  'Mishkat': 'مشكاة',
+  'Boeing': 'بوينغ',
   'Clear rules. Clear limits.': 'قواعد واضحة. وحدود واضحة.',
   'The displayed rules address three explicit conditions: a thermal cap, a low-reservoir interlock and a per-event irrigation limit.': 'تعالج القواعد المعروضة ثلاث حالات محددة: حدّاً حرارياً، وقفل انخفاض مستوى الخزان، وحداً لكمية الري في كل مرة.',
   'LED thermal cap': 'حد حرارة LED',
@@ -603,7 +612,7 @@ function AppPage() {
             <a href={isDashboard ? '/#model' : '/#architecture'} onClick={() => setMenuOpen(false)}>{isDashboard ? 'Prototype' : 'Decision chain'}</a>
             <a href="/#model" onClick={() => setMenuOpen(false)}>3D model</a>
             <a href="/#safeguards" onClick={() => setMenuOpen(false)}>Safeguards</a>
-            <a href={isDashboard ? '/#project' : '/#credits'} onClick={() => setMenuOpen(false)}>{isDashboard ? 'Project' : 'Credits'}</a>
+            <a href={isDashboard ? '/#project' : '/#credits'} onClick={() => setMenuOpen(false)}>{isDashboard ? 'Project' : 'Sponsors'}</a>
           </nav>
           <div className="site-controls" aria-label="Site preferences">
             <button type="button" className="preference-button" data-testid="button-language" aria-label={language === 'en' ? 'Switch language to Arabic' : 'Switch language to English'} onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}>{language === 'en' ? 'عربي' : 'English'}</button>
@@ -975,17 +984,53 @@ function AppPage() {
             <p>See the crop, the recorded frame and the rule outcome—without mistaking replay for live control.</p>
             <Link href="/dashboard" className="action closing-cta">Open the offline dashboard <ArrowRight size={16} /></Link>
           </div>
-          <footer className="journal-footer">
-            <div className="journal-footer-brand">
-              <img src="/images/oasis-logo-mark.png" alt="" />
-              <span><strong>O.A.S.I.S.</strong><small>Orbital Adaptive Smart Irrigation &amp; Sustenance</small></span>
-            </div>
-            <div className="journal-footer-links">
-              <a href="/#mission">Mission</a><a href="/#safeguards">Safeguards</a><a href="/#credits">Credits</a><Link href="/dashboard">Dashboard</Link>
-            </div>
-            <span className="footer-disclaimer">OFFLINE REPLAY · NO LIVE CONTROL</span>
-          </footer>
         </section>
+
+        <section id="credits" className="journal-section partners-section">
+          <div className="section-shell">
+            <div className="eyebrow">07 / Supporting organizations</div>
+            <div className="section-heading-row partners-heading">
+              <h2 className="display">Sponsors &amp; partners</h2>
+              <p>Organizations supporting the Space Lead 2026 challenge.</p>
+            </div>
+            <div className="partner-grid">
+              <figure className="partner-card">
+                <div className="partner-mark partner-mark-mewa"><img src="/images/partner-mewa.svg" alt="" /></div>
+                <figcaption>Ministry of Environment, Water &amp; Agriculture</figcaption>
+              </figure>
+              <figure className="partner-card">
+                <div className="partner-mark partner-mark-alfaisal"><img src="/images/partner-alfaisal.png" alt="" /></div>
+                <figcaption>Alfaisal University</figcaption>
+              </figure>
+              <figure className="partner-card">
+                <div className="partner-mark partner-mark-stc"><img src="/images/partner-stc.png" alt="" /></div>
+                <figcaption>stc</figcaption>
+              </figure>
+              <figure className="partner-card">
+                <div className="partner-mark partner-mark-ssa"><img src="/images/partner-ssa.webp" alt="" /></div>
+                <figcaption>Saudi Space Agency</figcaption>
+              </figure>
+              <figure className="partner-card">
+                <div className="partner-mark partner-mark-mishkat"><img src="/images/partner-mishkat.png" alt="" /></div>
+                <figcaption>Mishkat</figcaption>
+              </figure>
+              <figure className="partner-card">
+                <div className="partner-mark partner-mark-boeing"><img src="/images/partner-boeing.png" alt="" /></div>
+                <figcaption>Boeing</figcaption>
+              </figure>
+            </div>
+          </div>
+        </section>
+        <footer className="journal-footer">
+          <div className="journal-footer-brand">
+            <img src="/images/oasis-logo-mark.png" alt="" />
+            <span><strong>O.A.S.I.S.</strong><small>Orbital Adaptive Smart Irrigation &amp; Sustenance</small></span>
+          </div>
+          <div className="journal-footer-links">
+            <a href="/#mission">Mission</a><a href="/#safeguards">Safeguards</a><a href="/#credits">Sponsors</a><Link href="/dashboard">Dashboard</Link>
+          </div>
+          <span className="footer-disclaimer">OFFLINE REPLAY · NO LIVE CONTROL</span>
+        </footer>
         </>}
       </main>
       {isDashboard && <footer className="footer">
