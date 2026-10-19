@@ -474,3 +474,374 @@ img { display: block; max-width: 100%; }
   .rule-code { grid-column: 2; justify-self: start; }
   .crop-card { padding: 22px; }
 }
+
+/* O.A.S.I.S. dashboard — botanical field journal */
+#dashboard.dashboard-page {
+  padding: 42px 0 88px;
+  background:
+    radial-gradient(ellipse at 48% 15%, rgba(229, 238, 202, .72), transparent 42%),
+    linear-gradient(180deg, rgba(250, 248, 236, .55), rgba(246, 240, 223, 0));
+}
+#dashboard .dash-shell { max-width: 1390px; }
+#dashboard .dashboard-toolbar {
+  padding-bottom: 32px;
+  align-items: end;
+}
+#dashboard .dashboard-heading h1 {
+  margin-top: 10px;
+  font-size: clamp(38px, 4.4vw, 58px);
+  letter-spacing: -.045em;
+}
+#dashboard .dashboard-heading p { font-size: 17px; }
+#dashboard .dashboard-actions { gap: 12px; }
+#dashboard .plant-switcher {
+  border: 1px solid rgba(50, 79, 48, .14);
+  border-radius: 18px;
+  padding: 4px;
+  background: rgba(252, 248, 236, .78);
+}
+#dashboard .plant-tab {
+  min-height: 52px;
+  border-radius: 14px;
+  padding: 7px 17px;
+}
+#dashboard .plant-tab.active { background: #355b3b; }
+#dashboard .plant-tab span { font-size: 14px; }
+#dashboard .replay-button {
+  border-radius: 14px;
+  min-height: 58px;
+  background: #dce9a4;
+  padding: 0 19px;
+}
+#dashboard .botanical-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(215px, .76fr) minmax(320px, 1.18fr) minmax(350px, 1.05fr);
+  align-items: center;
+  gap: clamp(22px, 3vw, 52px);
+  min-height: 535px;
+  padding: 34px 40px;
+  overflow: hidden;
+  border-top: 1px solid rgba(50, 79, 48, .14);
+  border-bottom: 1px solid rgba(50, 79, 48, .14);
+  background: linear-gradient(110deg, rgba(239, 244, 222, .72), rgba(249, 248, 237, .68) 49%, rgba(231, 243, 226, .63));
+}
+#dashboard .botanical-stage.has-excursion { border-top-color: rgba(217, 130, 43, .35); }
+#dashboard .botanical-copy { position: relative; z-index: 2; align-self: center; }
+#dashboard .plant-kicker {
+  color: #5f7c4d;
+  font-size: 13px;
+  line-height: 1.6;
+  letter-spacing: .08em;
+}
+#dashboard .plant-overview h2,
+#dashboard .botanical-copy h2 {
+  margin: 12px 0 3px;
+  color: var(--forest);
+  font: 600 clamp(34px, 3.2vw, 46px)/1.04 var(--app-font-serif);
+  letter-spacing: -.035em;
+}
+#dashboard .plant-latin { font-size: 16px; }
+#dashboard .range-status {
+  margin-top: 29px;
+  font-size: 16px;
+  font-weight: 700;
+}
+#dashboard .range-status i { width: 9px; height: 9px; }
+#dashboard .range-explainer {
+  display: block;
+  margin-top: 7px;
+  max-width: 245px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+#dashboard .botanical-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+#dashboard .data-mode {
+  border: 0;
+  border-radius: 4px;
+  padding: 5px 8px;
+  color: #547450;
+  background: rgba(81, 125, 75, .1);
+  font-size: 14px;
+}
+#dashboard .frame-readout {
+  color: #65735f;
+  font-size: 14px;
+}
+#dashboard .frame-readout b { color: #294a32; }
+#dashboard .stage-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 205px;
+  margin-top: 55px;
+  color: #64745d;
+  font: italic 17px/1.4 var(--app-font-serif);
+}
+#dashboard .stage-note-rule {
+  flex: 0 0 23px;
+  height: 1px;
+  margin-top: 11px;
+  background: #8ca46c;
+}
+#dashboard .plant-portrait {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+  min-height: 445px;
+  margin: 0;
+  isolation: isolate;
+}
+#dashboard .portrait-halo {
+  position: absolute;
+  z-index: -1;
+  width: min(96%, 410px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 244, .92) 0%, rgba(222, 237, 197, .5) 52%, rgba(222, 237, 197, 0) 72%);
+}
+#dashboard .plant-portrait img {
+  width: 100%;
+  max-width: 440px;
+  height: 455px;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: drop-shadow(0 20px 15px rgba(47, 73, 43, .13));
+  animation: plant-arrive .75s both cubic-bezier(.2,.7,.2,1);
+}
+#dashboard .plant-portrait.crop-tomato img { max-width: 455px; }
+#dashboard .plant-portrait figcaption {
+  position: absolute;
+  right: 0;
+  bottom: 4px;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 6px 0;
+  border-top: 1px solid rgba(50, 79, 48, .15);
+  color: #6e7d62;
+  font: 14px var(--app-font-mono);
+  letter-spacing: .08em;
+}
+@keyframes plant-arrive {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+#dashboard .primary-readings { min-width: 0; }
+#dashboard .dash-section-heading {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(50, 79, 48, .16);
+}
+#dashboard .dash-section-heading > div { gap: 10px; }
+#dashboard .dash-section-heading h3 {
+  font-size: 21px;
+  white-space: nowrap;
+}
+#dashboard .section-index {
+  width: 25px;
+  height: 25px;
+  color: #446747;
+  background: #e1e9c7;
+  font-size: 13px;
+}
+#dashboard .signal-context {
+  color: #74806b;
+  font: 14px var(--app-font-mono);
+  white-space: nowrap;
+}
+#dashboard .signal-list { display: grid; }
+#dashboard .signal-card {
+  padding: 14px 0 15px;
+  border: 0;
+  border-bottom: 1px solid rgba(50, 79, 48, .13);
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+  box-shadow: none;
+  transition: none;
+}
+#dashboard .signal-card:last-child { border-bottom: 0; }
+#dashboard .signal-card:hover { transform: none; box-shadow: none; }
+#dashboard .signal-card::after { display: none; }
+#dashboard .signal-card-head { font-size: 15px; }
+#dashboard .signal-card-head i { width: 9px; height: 9px; }
+#dashboard .signal-value {
+  margin: 6px 0 9px;
+  font-size: 35px;
+  line-height: 1.03;
+}
+#dashboard .signal-value small { font-size: 16px; }
+#dashboard .gauge { height: 6px; margin: 3px 0 8px; }
+#dashboard .gauge-dot { width: 14px; height: 14px; margin: -7px 0 0 -7px; border-width: 2px; }
+#dashboard .signal-target {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+#dashboard .signal-target span { color: #6c7867; }
+#dashboard .signal-target b { color: #344f39; font-weight: 600; white-space: nowrap; }
+#dashboard .signal-state { margin-top: 3px; font-size: 14px; font-weight: 600; }
+#dashboard .signal-state.outside { color: #a65c1b; }
+#dashboard .secondary-readings {
+  margin: 0 0 36px;
+  border-bottom-color: rgba(50, 79, 48, .14);
+}
+#dashboard .secondary-readings summary,
+#dashboard .technical-details summary { min-height: 60px; font-size: 17px; }
+#dashboard .secondary-grid { padding-top: 3px; }
+#dashboard .secondary-reading {
+  border: 0;
+  border-top: 1px solid rgba(50, 79, 48, .13);
+  border-radius: 0;
+  background: transparent;
+  padding: 12px 6px;
+}
+#dashboard .secondary-reading b { font-size: 22px; }
+#dashboard .proposal-panel {
+  margin: 0 0 34px;
+  padding: 24px 28px;
+  border: 1px solid rgba(50, 79, 48, .14);
+  border-top: 3px solid #7b9a63;
+  border-radius: 8px 8px 18px 18px;
+  background: rgba(252, 248, 236, .78);
+}
+#dashboard .insight-heading h3 { font-size: 23px; }
+#dashboard .proposal-source { font-size: 14px; }
+#dashboard .proposal-intro { margin: 10px 0 3px; color: var(--ink-2); font-size: 16px; }
+#dashboard .pipeline-track {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin: 16px 0;
+  border-block: 1px solid rgba(50, 79, 48, .14);
+}
+#dashboard .pipeline-step {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+  padding: 13px 12px;
+}
+#dashboard .pipeline-step + .pipeline-step { border-left: 1px solid rgba(50, 79, 48, .14); }
+#dashboard .pipeline-step-number { color: #718469; font: 14px var(--app-font-mono); }
+#dashboard .pipeline-step-label { color: #66735f; font-size: 14.5px; line-height: 1.3; }
+#dashboard .pipeline-step b { color: var(--forest); font-size: 15.5px; line-height: 1.35; font-weight: 600; }
+#dashboard .pipeline-track.no-run .pipeline-step b { color: #6f7366; }
+#dashboard .proposal-table { margin-top: 4px; }
+#dashboard .proposal-table th, #dashboard .proposal-table td { padding: 12px 10px; }
+#dashboard .proposal-table thead th { font-size: 14px; }
+#dashboard .proposal-table tbody td { font-size: 18px; }
+#dashboard .proposal-table td.not-rule-checked { font-size: 15px; }
+#dashboard .proposal-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(50, 79, 48, .12);
+  color: #60705c;
+  font-size: 14px;
+}
+#dashboard .proposal-key span { display: inline-flex; align-items: center; gap: 7px; }
+#dashboard .proposal-key i { width: 8px; height: 8px; border-radius: 50%; }
+#dashboard .key-recorded { background: var(--teal); }
+#dashboard .key-checked { background: var(--leaf); }
+#dashboard .key-unchecked { background: #a2a294; }
+#dashboard .execution-status {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(50, 79, 48, .12);
+  font-size: 15px;
+}
+#dashboard .execution-status b { color: #875540; }
+#dashboard .history-section {
+  padding: 25px 28px 22px;
+  border: 1px solid rgba(50, 79, 48, .14);
+  border-radius: 18px;
+  background: rgba(252, 248, 236, .76);
+}
+#dashboard .history-heading h3 { font-size: 23px; }
+#dashboard .history-heading .section-index { grid-row: span 2; }
+#dashboard .history-heading p { font-size: 15px; }
+#dashboard .card-top h4 { font-size: 19px; }
+#dashboard .card-top p { font-size: 15px; }
+#dashboard .legend { font-size: 14px; }
+#dashboard .technical-details { margin-top: 22px; }
+#dashboard .technical-content { padding-bottom: 22px; }
+#dashboard .rule-events .rule-event { font-size: 15px; }
+#dashboard .rule-event b { font-size: 14px; }
+#dashboard .proposal-empty, #dashboard .chart-unavailable { font-size: 16px; }
+#dashboard .chart-unavailable { background: rgba(227, 235, 215, .3); border-radius: 12px; }
+#dashboard .axis-label { font-size: 13px; }
+#dashboard .frame-times { font-size: 13px; }
+
+@media (max-width: 1080px) {
+  #dashboard .botanical-stage {
+    grid-template-columns: minmax(190px, .72fr) minmax(270px, 1fr);
+    gap: 28px;
+    padding: 30px;
+  }
+  #dashboard .primary-readings { grid-column: 1 / -1; }
+  #dashboard .signal-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+  #dashboard .signal-card { border-bottom: 0; }
+}
+@media (max-width: 720px) {
+  #dashboard.dashboard-page { padding: 28px 0 56px; }
+  #dashboard .dashboard-toolbar { gap: 20px; padding-bottom: 22px; }
+  #dashboard .dashboard-actions { flex-direction: row; align-items: center; }
+  #dashboard .botanical-stage {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 25px 21px 22px;
+  }
+  #dashboard .botanical-copy { order: 0; }
+  #dashboard .botanical-copy h2 { margin-top: 8px; font-size: 38px; }
+  #dashboard .range-status { margin-top: 17px; }
+  #dashboard .range-explainer { max-width: 340px; }
+  #dashboard .stage-note { display: none; }
+  #dashboard .plant-portrait {
+    order: 1;
+    min-height: 325px;
+    max-height: 355px;
+    margin: -2px 0 8px;
+  }
+  #dashboard .plant-portrait img { height: 330px; max-width: 360px; }
+  #dashboard .plant-portrait.crop-tomato img { max-width: 370px; }
+  #dashboard .portrait-halo { width: min(86%, 310px); }
+  #dashboard .plant-portrait figcaption { bottom: -3px; }
+  #dashboard .primary-readings { order: 2; }
+  #dashboard .signal-list { grid-template-columns: 1fr; gap: 0; }
+  #dashboard .signal-card { border-bottom: 1px solid rgba(50, 79, 48, .13); }
+  #dashboard .signal-card:last-child { border-bottom: 0; }
+  #dashboard .signal-value { font-size: 39px; }
+  #dashboard .proposal-panel { padding: 20px 17px; }
+  #dashboard .proposal-panel .insight-heading { align-items: flex-start; flex-direction: column; gap: 6px; }
+  #dashboard .proposal-panel .proposal-source { margin-left: 37px; }
+  #dashboard .history-section { padding: 21px 15px; }
+  #dashboard .history-heading { flex-direction: column; align-items: flex-start; }
+  #dashboard .metric-picker { width: 100%; }
+  #dashboard .proposal-table tbody tr { grid-template-columns: 1fr 1fr; }
+  #dashboard .proposal-key { gap: 7px 15px; }
+  #dashboard .pipeline-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #dashboard .pipeline-step { padding: 11px 9px; }
+  #dashboard .pipeline-step:nth-child(odd) { border-left: 0; padding-left: 0; }
+  #dashboard .pipeline-step:nth-child(n+3) { border-top: 1px solid rgba(50, 79, 48, .14); }
+}
+@media (max-width: 480px) {
+  #dashboard .dashboard-actions { flex-wrap: wrap; }
+  #dashboard .plant-switcher { width: 100%; }
+  #dashboard .plant-tab { padding-inline: 11px; }
+  #dashboard .replay-button { width: 100%; min-height: 48px; }
+  #dashboard .signal-target { font-size: 14px; }
+  #dashboard .details-meta { font-size: 14px; text-align: right; }
+  #dashboard .history-heading > div { grid-template-columns: 28px minmax(0, 1fr); gap: 0 8px; }
+  #dashboard .frame-times { font-size: 13px; }
+}

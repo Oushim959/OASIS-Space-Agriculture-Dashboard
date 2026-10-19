@@ -313,9 +313,9 @@ function AppPage() {
           <div className="shell dash-shell">
             <header className="dashboard-toolbar">
               <div className="dashboard-heading">
-                <div className="eyebrow">O.A.S.I.S. / Mission data</div>
-                <h1>Habitat monitor</h1>
-                <p>Plant profiles · replay-based control review</p>
+                <div className="eyebrow">O.A.S.I.S. / Crop observation</div>
+                <h1>Life, in the loop.</h1>
+                <p>Plant health is habitat health.</p>
               </div>
               <div className="dashboard-actions">
                 <div className="plant-switcher" role="group" aria-label="Select plant">
@@ -331,49 +331,53 @@ function AppPage() {
               </div>
             </header>
 
-            <section className={`plant-overview ${hasReplayData && outsideProfileCount > 0 ? 'has-excursion' : ''}`} aria-live="polite">
-              <div className="plant-overview-main">
+            <section className={`botanical-stage ${hasReplayData && outsideProfileCount > 0 ? 'has-excursion' : ''}`} aria-live="polite">
+              <div className="botanical-copy">
                 <div className="plant-kicker">{activeProfile.medium} <span>·</span> {activeProfile.stage}</div>
                 <h2>{activeProfile.name}</h2>
                 <p className="plant-latin">{activeProfile.latin}</p>
+                <div className={`range-status ${!hasReplayData ? 'unavailable' : outsideProfileCount > 0 ? 'outside' : 'within'}`}>
+                  <i aria-hidden="true" />{!hasReplayData ? 'Profile configured' : outsideProfileCount > 0 ? `${outsideProfileCount} signals outside range` : 'Signals within profile'}
+                </div>
+                <p className="range-explainer">{hasReplayData ? 'Three measured or derived signals compared with this crop profile.' : 'Targets are configured; no tomato sensor run is available.'}</p>
+                <div className="botanical-meta">
+                  <span className="data-mode">OFFLINE NOTEBOOK</span>
+                  {hasReplayData && <span className="frame-readout">FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></span>}
+                </div>
+                <div className="stage-note"><span className="stage-note-rule" />Fresh food is part of life support.</div>
               </div>
-              <div className="plant-overview-state">
-                <span className={`range-status ${!hasReplayData ? 'unavailable' : outsideProfileCount > 0 ? 'outside' : 'within'}`}>
-                  <i aria-hidden="true" />{!hasReplayData ? 'No replay data' : outsideProfileCount > 0 ? `${outsideProfileCount} profile ranges exceeded` : 'Within configured ranges'}
-                </span>
-                <span className="range-explainer">{hasReplayData ? '3 measured or derived signals checked against this plant profile' : 'This plant has targets, but no measurements in the notebook replay'}</span>
-                {hasReplayData && <span className="frame-readout">FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></span>}
-              </div>
-              <span className="data-mode">SYNTHETIC · OFFLINE</span>
-            </section>
 
-            {!hasReplayData && <div className="plant-data-empty" role="status">
-              <strong>No dwarf tomato run is included in this dataset.</strong> The target ranges below come from its configured profile; sensor values, proposals, and history are not available.
-            </div>}
+              <figure className={`plant-portrait crop-${crop}`}>
+                <div className="portrait-halo" aria-hidden="true" />
+                <img src={crop === 'potato' ? '/images/potato-plant-cutout.png' : '/images/tomato-plant-cutout.png'} alt={crop === 'potato' ? 'Potato plant growing in a terracotta-colored substrate pot' : 'Dwarf tomato plant bearing ripe fruit in a hydroponic habitat vessel'} />
+                <figcaption><span>01 / 02</span><span>{crop === 'potato' ? 'TUBER CROP' : 'FRUITING CROP'}</span></figcaption>
+              </figure>
 
-            <section className="primary-readings" aria-labelledby="primary-readings-title">
-              <div className="dash-section-heading">
-                <div><span className="section-index">01</span><h3 id="primary-readings-title">Primary readings</h3></div>
-              </div>
-              <div className="signal-grid">
-                {[
-                  { key: 'temperature', min: 10, max: 32, raw: sample.air, label: 'Air temperature', value: hasReplayData ? sample.air.toFixed(1) : '—', unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, rng: activeProfile.air, outside: hasReplayData && profileChecks[0].outside },
-                  { key: 'moisture', min: 0, max: 60, raw: sample.moisture, label: 'Substrate moisture', value: hasReplayData ? sample.moisture.toFixed(1) : '—', unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, rng: activeProfile.moisture, outside: hasReplayData && profileChecks[1].outside },
-                  { key: 'vpd', min: 0, max: 2.2, raw: vpd, label: 'Vapor pressure deficit', value: hasReplayData ? vpd.toFixed(2) : '—', unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, rng: activeProfile.vpd, outside: hasReplayData && profileChecks[2].outside },
-                ].map((signal) => (
-                  <article className={`signal-card signal-${signal.key}`} key={signal.key}>
-                    <div className="signal-card-head"><span>{signal.label}</span><i aria-hidden="true" /></div>
-                    <div className="signal-value">{signal.value}<small>{hasReplayData && signal.unit}</small></div>
-                    <div className="gauge" aria-hidden="true"><span className="gauge-band" style={{ left: `${(signal.rng[0] - signal.min) / (signal.max - signal.min) * 100}%`, width: `${(signal.rng[1] - signal.rng[0]) / (signal.max - signal.min) * 100}%` }} />{hasReplayData && <span className="gauge-dot" style={{ left: `${Math.min(100, Math.max(0, (signal.raw - signal.min) / (signal.max - signal.min) * 100))}%` }} />}</div>
-                    <div className="signal-target">Profile range <b>{signal.target}</b></div>
-                    <div className={`signal-state ${signal.outside ? 'outside' : ''}`}>{hasReplayData ? signal.outside ? 'Outside range' : 'Within range' : 'No reading recorded'}</div>
-                  </article>
-                ))}
-              </div>
+              <section className="primary-readings" aria-labelledby="primary-readings-title">
+                <div className="dash-section-heading">
+                  <div><span className="section-index">01</span><h3 id="primary-readings-title">Plant signals</h3></div>
+                  <span className="signal-context">{hasReplayData ? `Frame ${frame + 1}` : 'Profile targets'}</span>
+                </div>
+                <div className="signal-list">
+                  {[
+                    { key: 'temperature', min: 10, max: 32, raw: sample.air, label: 'Air temperature', value: hasReplayData ? sample.air.toFixed(1) : '—', unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, rng: activeProfile.air, outside: hasReplayData && profileChecks[0].outside, cue: !hasReplayData ? 'No reading recorded' : profileChecks[0].outside ? sample.air < activeProfile.air[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
+                    { key: 'moisture', min: 0, max: 60, raw: sample.moisture, label: 'Substrate moisture', value: hasReplayData ? sample.moisture.toFixed(1) : '—', unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, rng: activeProfile.moisture, outside: hasReplayData && profileChecks[1].outside, cue: !hasReplayData ? 'No reading recorded' : profileChecks[1].outside ? sample.moisture < activeProfile.moisture[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
+                    { key: 'vpd', min: 0, max: 2.2, raw: vpd, label: 'Derived VPD', value: hasReplayData ? vpd.toFixed(2) : '—', unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, rng: activeProfile.vpd, outside: hasReplayData && profileChecks[2].outside, cue: !hasReplayData ? 'No reading recorded' : profileChecks[2].outside ? vpd < activeProfile.vpd[0] ? 'Below profile' : 'Above profile' : 'Within profile' },
+                  ].map((signal) => (
+                    <article className={`signal-card signal-${signal.key}`} key={signal.key}>
+                      <div className="signal-card-head"><span>{signal.label}</span><i aria-hidden="true" /></div>
+                      <div className="signal-value">{signal.value}<small>{hasReplayData ? signal.unit : ''}</small></div>
+                      <div className="gauge" aria-hidden="true"><span className="gauge-band" style={{ left: `${(signal.rng[0] - signal.min) / (signal.max - signal.min) * 100}%`, width: `${(signal.rng[1] - signal.rng[0]) / (signal.max - signal.min) * 100}%` }} />{hasReplayData && <span className="gauge-dot" style={{ left: `${Math.min(100, Math.max(0, (signal.raw - signal.min) / (signal.max - signal.min) * 100))}%` }} />}</div>
+                      <div className="signal-target"><span>Profile range</span><b>{signal.target}</b></div>
+                      <div className={`signal-state ${signal.outside ? 'outside' : ''}`}>{signal.cue}</div>
+                    </article>
+                  ))}
+                </div>
+              </section>
             </section>
 
             <details className="secondary-readings">
-              <summary><span>All sensor readings</span><span className="details-meta">{hasReplayData ? '4 additional signals' : 'No additional readings for this plant'}</span></summary>
+              <summary><span>Atmosphere &amp; system readings</span><span className="details-meta">{hasReplayData ? '4 recorded channels' : 'No tomato telemetry recorded'}</span></summary>
               <div className="secondary-grid">
                 {[
                   { key: 'humidity', label: 'Relative humidity', value: hasReplayData ? `${sample.rh}%` : 'Not recorded' },
@@ -386,39 +390,46 @@ function AppPage() {
               </div>
             </details>
 
-            <div className="dashboard-insights">
-              <section className="ai-assessment" aria-labelledby="ai-assessment-title">
-                <div className="insight-heading">
-                      <div><span className="section-index">02</span><h3 id="ai-assessment-title">AI assessment</h3></div>
-                  <span className="ai-state"><i />Unavailable</span>
-                </div>
-                <p className="ai-empty-title">No model result for this replay</p>
-                <p className="ai-empty-copy">This dashboard reproduces notebook data and does not call an LLM. No live assessment, explanation, or AI-generated recommendation is available here.</p>
-              </section>
-
-              <section className="proposal-panel" aria-labelledby="proposal-title">
-                <div className="insight-heading">
-                  <div><span className="section-index">03</span><h3 id="proposal-title">Controller proposal</h3></div>
-                  {hasReplayData && <span className="proposal-source">Potato notebook replay</span>}
-                </div>
-                {hasReplayData ? <>
-                  <table className="proposal-table">
-                    <thead><tr><th scope="col">Control</th><th scope="col">Proposed</th><th scope="col">Replay rule result</th></tr></thead>
-                    <tbody>
-                      <tr><th scope="row">Irrigation volume</th><td>{proposedIrrigation} ml</td><td>{permittedIrrigation} ml</td></tr>
-                      <tr><th scope="row">Light intensity</th><td>{proposedLight}%</td><td>{permittedLight}%</td></tr>
-                      <tr><th scope="row">Red : blue ratio</th><td>~{redBlueProposal[frame]} : 1</td><td className="not-rule-checked">No rule</td></tr>
-                      <tr><th scope="row">Fan duty</th><td>{fanProposal[frame]}%</td><td className="not-rule-checked">No rule</td></tr>
-                    </tbody>
-                  </table>
-                  <div className="execution-status"><span>Human approval <b>Not connected</b></span><span>Hardware execution <b>Not sent</b></span></div>
-                </> : <p className="proposal-empty">No controller proposal is recorded for the dwarf tomato profile.</p>}
-              </section>
-            </div>
+            <section className="proposal-panel" aria-labelledby="proposal-title">
+              <div className="insight-heading">
+                <div><span className="section-index">02</span><h3 id="proposal-title">Recorded control proposal</h3></div>
+                {hasReplayData && <span className="proposal-source">Potato · offline notebook replay</span>}
+              </div>
+              {hasReplayData ? <>
+                <p className="proposal-intro">Stored notebook output for this frame; no live LLM call.</p>
+              </> : <p className="proposal-intro">No recorded sensor run or model output exists for this crop.</p>}
+              <div className={`pipeline-track ${hasReplayData ? 'has-run' : 'no-run'}`} aria-label="Readings to hardware pipeline">
+                {[
+                  { label: 'Sensor snapshot', status: hasReplayData ? `Frame ${String(frame + 1).padStart(2, '0')}` : 'No run recorded' },
+                  { label: 'LLM proposal', status: hasReplayData ? 'Stored output' : 'Unavailable' },
+                  { label: 'Rule review', status: hasReplayData ? 'Results below' : 'Not run' },
+                  { label: 'Human approval', status: 'Not connected' },
+                  { label: 'Hardware', status: 'Not sent' },
+                ].map((step, index) => (
+                  <div className="pipeline-step" key={step.label}>
+                    <span className="pipeline-step-number">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="pipeline-step-label">{step.label}</span>
+                    <b>{step.status}</b>
+                  </div>
+                ))}
+              </div>
+              {hasReplayData ? <>
+                <table className="proposal-table">
+                  <thead><tr><th scope="col">Control</th><th scope="col">Recorded proposal</th><th scope="col">Deterministic rule result</th></tr></thead>
+                  <tbody>
+                    <tr><th scope="row">Irrigation volume</th><td>{proposedIrrigation} ml</td><td>{permittedIrrigation} ml</td></tr>
+                    <tr><th scope="row">Light intensity</th><td>{proposedLight}%</td><td>{permittedLight}%</td></tr>
+                    <tr><th scope="row">Red : blue ratio</th><td>~{redBlueProposal[frame]} : 1</td><td className="not-rule-checked">Not checked</td></tr>
+                    <tr><th scope="row">Fan duty</th><td>{fanProposal[frame]}%</td><td className="not-rule-checked">Not checked</td></tr>
+                  </tbody>
+                </table>
+                <div className="proposal-key"><span><i className="key-recorded" />Recorded proposal</span><span><i className="key-checked" />Rule-checked result</span><span><i className="key-unchecked" />No rule applied</span></div>
+              </> : null}
+            </section>
 
             <section className="history-section" aria-labelledby="history-title">
               <div className="history-heading">
-                <div><span className="section-index">04</span><h3 id="history-title">Sensor history</h3><p>Notebook replay · 12 Oct 2026 · 15-minute samples</p></div>
+                <div><span className="section-index">03</span><h3 id="history-title">Signal history</h3><p>Potato notebook replay · 12 Oct 2026 · 15-minute samples</p></div>
                 <label className="metric-picker"><span>Signal</span><select id="metric-select" className="select-control" disabled={!hasReplayData} value={metric} onChange={(event) => setMetric(event.target.value as MetricKey)}>
                   <option value="moisture">Substrate moisture</option><option value="air">Air temperature</option><option value="vpd">Derived VPD</option>
                 </select></label>
@@ -430,17 +441,17 @@ function AppPage() {
                   <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max="7" step="1" value={frame} onChange={(event) => setFrame(Number(event.target.value))} />
                   <div className="frame-times">{frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
                 </div>
-              </> : <div className="chart-unavailable">History is unavailable until a dwarf tomato telemetry run is added.</div>}
+              </> : <div className="chart-unavailable">No dwarf tomato sensor run or history is available.</div>}
             </section>
 
             <details className="technical-details">
               <summary><span>Technical details</span><span className="details-meta">{hasReplayData ? `${interventions.length} rule adjustment${interventions.length === 1 ? '' : 's'} in this frame` : 'No run-specific rule results'}</span></summary>
               {hasReplayData ? <div className="technical-content">
                 <div className="rule-reference">
-                  <h4>Configured rule checks</h4>
+                  <h4>Deterministic checks in replay</h4>
                   <p><b>LED thermal cap</b><span>At ≥60°C, cap proposed light intensity at 15%.</span></p>
                   <p><b>Low reservoir interlock</b><span>Below 5%, set irrigation volume to zero.</span></p>
-                  <p><b>Per-event irrigation cap</b><span>Limit any proposed irrigation event to 150 ml.</span></p>
+                  <p><b>Per-event irrigation cap</b><span>Limit an irrigation event to 150 ml.</span></p>
                   <p className="vpd-formula">VPD = 0.61078 × exp(17.27 × T / (T + 237.3)) × (1 − RH/100).</p>
                 </div>
                 <div className="rule-events" aria-live="polite">
