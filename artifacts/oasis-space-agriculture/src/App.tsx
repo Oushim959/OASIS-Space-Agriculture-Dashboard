@@ -621,7 +621,6 @@ function AppPage() {
           <div className="hero-art" aria-hidden="true"><img src="/images/oasis-canopy-hero.jpg" alt="" /></div>
           <div className="hero-shade" aria-hidden="true" />
           <div className="hero-copy">
-            <div className="hero-mark"><img src="/images/oasis-logo-mark.png" alt="" /><span>O.A.S.I.S. <i>·</i> orbital cultivation</span></div>
             <div className="eyebrow">Plant-first habitat concept</div>
             <h1 className="hero-title"><span>Food,</span><span>beyond Earth.</span></h1>
             <p>A cultivation concept exploring how food, water, atmosphere and power can work together in a closed habitat.</p>
