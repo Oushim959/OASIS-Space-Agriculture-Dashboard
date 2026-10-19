@@ -36,12 +36,12 @@ const vpdFor = (air: number, rh: number) =>
 
 const cropData = {
   potato: {
-    name: 'Potato', latin: 'Solanum tuberosum', medium: 'Martian regolith · tuber bulking',
+    name: 'Potato', latin: 'Solanum tuberosum', stage: 'Tuber bulking', medium: 'Martian regolith',
     vpd: [0.8, 1.2], dli: 18, air: [18, 22], moisture: [35, 45],
     risks: 'Perchlorate saturation · capillary waterlogging · root-zone hypoxia',
   },
   tomato: {
-    name: 'Dwarf tomato', latin: 'Solanum lycopersicum', medium: 'Hydroponic loop · fruiting',
+    name: 'Dwarf tomato', latin: 'Solanum lycopersicum', stage: 'Fruiting', medium: 'Hydroponic loop',
     vpd: [1.0, 1.4], dli: 22, air: [21, 26], moisture: [40, 50],
     risks: 'Ethylene during flowering · photosynthetic depression from high CO₂',
   },
@@ -180,10 +180,10 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
     metric === 'moisture' ? f.moisture : metric === 'air' ? f.air : vpdFor(f.air, f.rh),
   ), [metric]);
   const config = metric === 'moisture'
-    ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#54e1a9', unit: '%', title: 'Substrate moisture' }
+    ? { min: 0, max: 60, target: cropData[crop].moisture, color: '#73d19a', unit: '%', title: 'Substrate moisture' }
     : metric === 'air'
-      ? { min: 10, max: 32, target: cropData[crop].air, color: '#62d8ed', unit: '°C', title: 'Ambient temperature' }
-      : { min: 0, max: 2.2, target: cropData[crop].vpd, color: '#54e1a9', unit: 'kPa', title: 'Derived VPD' };
+      ? { min: 10, max: 32, target: cropData[crop].air, color: '#f0a36b', unit: '°C', title: 'Air temperature' }
+      : { min: 0, max: 2.2, target: cropData[crop].vpd, color: '#70bdea', unit: 'kPa', title: 'Derived VPD' };
   const W = 600, H = 225, padL = 36, padR = 12, padT = 12, padB = 28;
   const x = (i: number) => padL + (i * (W - padL - padR)) / 7;
   const y = (v: number) => padT + ((config.max - v) / (config.max - config.min)) * (H - padT - padB);
@@ -199,7 +199,7 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
       </div>
       <div className="chart-area">
         <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${config.title} across eight synthetic telemetry frames. Target ${config.target[0]} to ${config.target[1]} ${config.unit}.`}>
-          <rect x={padL} y={bandTop} width={W - padL - padR} height={Math.max(2, bandBottom - bandTop)} className="target-band" />
+            <rect x={padL} y={bandTop} width={W - padL - padR} height={Math.max(2, bandBottom - bandTop)} className="target-band" style={{ fill: `${config.color}22` }} />
           {gridValues.map((value) => (
             <g key={value}>
               <line x1={padL} x2={W - padR} y1={y(value)} y2={y(value)} className="chart-gridline" />
@@ -214,7 +214,7 @@ function TelemetryChart({ metric, crop, activeFrame }: { metric: MetricKey; crop
           ))}
           <path d={path} className="chart-line" stroke={config.color} />
           {chartValues.map((value, i) => (
-            <circle key={i} cx={x(i)} cy={y(value)} r={i === activeFrame ? 5 : 3} fill={i === activeFrame ? '#62d8ed' : config.color} className="chart-point">
+            <circle key={i} cx={x(i)} cy={y(value)} r={i === activeFrame ? 5 : 3} fill={i === activeFrame ? '#f5f0d2' : config.color} className="chart-point">
               <title>{formatTime(i)} · {formatValue(value)}</title>
             </circle>
           ))}
@@ -236,6 +236,7 @@ function AppPage() {
   const [modelError, setModelError] = useState('');
   const sample = frames[frame];
   const vpd = vpdFor(sample.air, sample.rh);
+  const hasReplayData = crop === 'potato';
   const activeProfile = cropData[crop];
   const profileChecks = [
     { label: 'Air temperature', value: `${sample.air.toFixed(1)} °C`, range: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, outside: sample.air < activeProfile.air[0] || sample.air > activeProfile.air[1] },
@@ -245,10 +246,10 @@ function AppPage() {
   const outsideProfileCount = profileChecks.filter((check) => check.outside).length;
   const proposedIrrigation = irrigateProposal[frame];
   const proposedLight = lightProposal[frame];
-  const appliedIrrigation = sample.reservoir < 5 ? 0 : Math.min(proposedIrrigation, 150);
-  const appliedLight = sample.led >= 60 ? Math.min(proposedLight, 15) : proposedLight;
+  const permittedIrrigation = sample.reservoir < 5 ? 0 : Math.min(proposedIrrigation, 150);
+  const permittedLight = sample.led >= 60 ? Math.min(proposedLight, 15) : proposedLight;
   const interventions = [
-    ...(sample.led >= 60 ? [`LED ${sample.led}°C ≥ 60°C: light capped ${proposedLight}% → ${appliedLight}%`] : []),
+    ...(sample.led >= 60 ? [`LED ${sample.led}°C ≥ 60°C: light capped ${proposedLight}% → ${permittedLight}%`] : []),
     ...(sample.reservoir < 5 ? [`Reservoir ${sample.reservoir}% < 5%: irrigation forced ${proposedIrrigation} ml → 0 ml`] : []),
     ...(sample.reservoir >= 5 && proposedIrrigation > 150 ? ['Irrigation request capped at 150 ml'] : []),
   ];
@@ -264,6 +265,10 @@ function AppPage() {
     }, 1150);
     return () => window.clearInterval(timer);
   }, [playing]);
+
+  useEffect(() => {
+    if (!hasReplayData) setPlaying(false);
+  }, [hasReplayData]);
 
   const handleModelFile = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -363,7 +368,6 @@ function AppPage() {
                 <div className="eyebrow">Notebook model selection</div>
                 <h3>Reasoning matters.<br /><span>So does the boundary.</span></h3>
                 <p>The notebook selected <strong>openai/gpt-oss-120b</strong> for deeper reasoning and more granular relay-level outputs. The figures shown are from an earlier comparison, not a test of operational safety.</p>
-                <div className="benchmark-caveat"><ShieldCheck size={15} /><span>Reported notebook benchmark—not re-run here. A valid response is still only a proposal; deterministic safeguards remain necessary.</span></div>
               </div>
               <div className="surface benchmark-table" aria-label="Notebook model benchmark summary">
                 <div className="bench-row bench-heading"><span>Model / provider</span><span>Mean latency</span><span>Valid JSON</span><span>Notebook observation</span></div>
@@ -377,96 +381,145 @@ function AppPage() {
         </section>
 
         </>}
-        {isDashboard && <section id="dashboard" className="section dashboard-section dashboard-page">
-          <div className="shell">
-            <div className="section-head">
-              <div><div className="eyebrow">O.A.S.I.S. / Mission data</div><h2>Dashboard</h2></div>
-              <p>Move through the recorded sequence, switch crop context, and compare proposed values with what the fixed rules permit. Profile selection changes the target bands; the recorded controller output remains the notebook’s potato run.</p>
-            </div>
-            <div className="dashboard-wrap">
-              <div className="dash-head">
-                <div className="dash-title">
-                  <div className="brand-mark"><Activity size={17} /></div>
-                  <div><h3>Habitat telemetry replay</h3><p>O.A.S.I.S. / NOTEBOOK DATASET</p></div>
-                  <span className="live-badge"><span className="dot" /> OFFLINE REPLAY</span>
-                </div>
-                <div className="dash-controls">
-                  <label className="micro-label" htmlFor="crop-select">Profile</label>
-                  <select id="crop-select" className="select-control" value={crop} onChange={(event) => setCrop(event.target.value as CropKey)}>
-                    <option value="potato">Potato · tuber bulking</option>
-                    <option value="tomato">Dwarf tomato · fruiting</option>
-                  </select>
-                  <button className="small-btn" onClick={() => setPlaying(!playing)} aria-label={playing ? 'Pause simulation replay' : 'Play simulation replay'}>
-                    {playing ? <Pause size={13} /> : <Play size={13} />}{playing ? 'Pause' : 'Play replay'}
-                  </button>
-                </div>
+        {isDashboard && <section id="dashboard" className="dashboard-page">
+          <div className="shell dash-shell">
+            <header className="dashboard-toolbar">
+              <div className="dashboard-heading">
+                <div className="eyebrow">O.A.S.I.S. / Mission data</div>
+                <h1>Habitat monitor</h1>
+                <p>Plant profiles · replay-based control review</p>
               </div>
-              <div className="dash-body">
-                  <div className="demo-notice">
-                  <span><strong>SYNTHETIC REPLAY</strong> · 8 frames, 15 minutes apart · 2026-10-12 00:00–01:45 · not live sensor data</span>
-                  <span className="demo-stamp">FRAME {String(frame + 1).padStart(2, '0')} / 08 &nbsp; · &nbsp; {formatTime(frame)}</span>
+              <div className="dashboard-actions">
+                <div className="plant-switcher" role="group" aria-label="Select plant">
+                  {(['potato', 'tomato'] as CropKey[]).map((key) => (
+                    <button type="button" key={key} aria-pressed={crop === key} className={crop === key ? 'plant-tab active' : 'plant-tab'} onClick={() => setCrop(key)}>
+                      {cropData[key].name}<span>{cropData[key].stage}</span>
+                    </button>
+                  ))}
                 </div>
-                <section className="assessment-panel" aria-live="polite" aria-label="Rules-based crop profile assessment">
-                  <div className="assessment-summary">
-                    <div className="eyebrow">Frame assessment · rules-based</div>
-                    <h3>{outsideProfileCount === 0 ? 'Within configured profile ranges' : `${outsideProfileCount} of 3 readings outside profile range`}</h3>
-                    <p>Comparison against the selected {activeProfile.name.toLowerCase()} profile. This is not an AI diagnosis or a plant-safety determination.</p>
-                  </div>
-                  <div className="assessment-evidence">
-                    {profileChecks.map((check) => (
-                      <div className="evidence-row" key={check.label}>
-                        <span>{check.label}</span>
-                        <b>{check.value}</b>
-                        <span className={check.outside ? 'evidence-state outside' : 'evidence-state'}>{check.outside ? 'Outside' : 'Within'} · target {check.range}</span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-                <div className="telemetry-grid">
-                  <div className="surface metric"><div className="metric-top"><span>AIR TEMP</span><Thermometer size={13} /></div><div className="metric-value">{sample.air.toFixed(1)}<small> °C</small></div><div className={`metric-status ${sample.air < cropData[crop].air[0] || sample.air > cropData[crop].air[1] ? 'warn' : ''}`}>{sample.air >= cropData[crop].air[0] && sample.air <= cropData[crop].air[1] ? 'IN PROFILE RANGE' : 'OUTSIDE PROFILE'}</div></div>
-                  <div className="surface metric"><div className="metric-top"><span>REL. HUMIDITY</span><Waves size={13} /></div><div className="metric-value">{sample.rh}<small> %</small></div><div className="metric-status">SENSOR INPUT</div></div>
-                  <div className="surface metric"><div className="metric-top"><span>SUBSTRATE</span><Droplets size={13} /></div><div className="metric-value">{sample.moisture}<small> %</small></div><div className={`metric-status ${sample.moisture < cropData[crop].moisture[0] ? 'warn' : ''}`}>{sample.moisture < cropData[crop].moisture[0] ? 'BELOW PROFILE RANGE' : 'SENSOR INPUT'}</div></div>
-                  <div className="surface metric"><div className="metric-top"><span>DERIVED VPD</span><Gauge size={13} /></div><div className="metric-value">{vpd.toFixed(2)}<small> kPa</small></div><div className={`metric-status ${vpd < cropData[crop].vpd[0] || vpd > cropData[crop].vpd[1] ? 'warn' : ''}`}>{vpd >= cropData[crop].vpd[0] && vpd <= cropData[crop].vpd[1] ? 'IN PROFILE RANGE' : 'OUTSIDE PROFILE'}</div></div>
-                  <div className="surface metric"><div className="metric-top"><span>CO₂</span><Atom size={13} /></div><div className="metric-value">{sample.co2}<small> ppm</small></div><div className="metric-status">SENSOR INPUT</div></div>
-                  <div className="surface metric"><div className="metric-top"><span>LED / RESERVOIR</span><Lightbulb size={13} /></div><div className="metric-value">{sample.led}<small> °C</small></div><div className={`metric-status ${sample.led >= 60 || sample.reservoir < 5 ? 'warn' : ''}`}>RESERVOIR {sample.reservoir}%</div></div>
-                </div>
-                <div className="dashboard-main">
-                  <div className="surface chart-card">
-                    <div className="card-top">
-                      <div><h4>Sensor trend · synthetic history</h4><p>Target band follows the selected crop profile</p></div>
-                      <label className="sr-only" htmlFor="metric-select">Chart signal</label>
-                      <select id="metric-select" className="select-control" value={metric} onChange={(event) => setMetric(event.target.value as MetricKey)}>
-                        <option value="moisture">Substrate %</option><option value="air">Air temperature</option><option value="vpd">Derived VPD</option>
-                      </select>
-                    </div>
-                    <TelemetryChart metric={metric} crop={crop} activeFrame={frame} />
-                    <label className="micro-label" htmlFor="frame-range">Frame timeline · 2026-10-12 · 00:00–01:45</label>
-                    <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max="7" step="1" value={frame} onChange={(event) => setFrame(Number(event.target.value))} style={{ width: '100%', accentColor: '#54e1a9', margin: '9px 0 3px' }} />
-                    <div className="frame-times">{frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
-                  </div>
-                  <div className="surface controls-card">
-                      <div className="card-top"><div><h4>Control proposal / rule decision</h4><p>Recorded proposal · deterministic replay only</p></div><ClipboardList size={15} color="#62d8ed" /></div>
-                    <div className="column-head"><span /><span className="control-column-label">Proposed</span><span className="control-column-label">Permitted*</span></div>
-                    <div className="control-row"><span className="control-name">Irrigation</span><span className="control-val proposed">{proposedIrrigation} ml</span><span className="control-val applied">{appliedIrrigation} ml</span></div>
-                     <div className="control-row"><span className="control-name">R:B (from rationale)</span><span className="control-val proposed">~{redBlueProposal[frame]} : 1</span><span className="control-val applied">~{redBlueProposal[frame]} : 1</span></div>
-                    <div className="control-row"><span className="control-name">Light intensity</span><span className="control-val proposed">{lightProposal[frame]}%</span><span className="control-val applied">{appliedLight}%</span></div>
-                    <div className="control-row"><span className="control-name">Fan duty</span><span className="control-val proposed">{fanProposal[frame]}%</span><span className="control-val applied">{fanProposal[frame]}%</span></div>
-                    {interventions.length > 0 ? (
-                      <div className="rule-alert"><AlertTriangle size={14} /><span><strong>Rule adjustment in replay</strong><br />{interventions.join(' · ')}</span></div>
-                    ) : (
-                      <div className="rule-alert safe"><Check size={14} /><span>No configured rule intervened in this frame. This is not a guarantee of overall plant safety.</span></div>
-                    )}
-                  </div>
-                </div>
-                <div className="surface event-log" aria-live="polite">
-                  <div className="event-log-head"><h4>Rule decisions · replay only</h4><span>{interventions.length} ADJUSTMENT{interventions.length === 1 ? '' : 'S'} · FRAME {frame + 1}</span></div>
-                  {interventions.length ? interventions.map((text) => (
-                    <div className="log-entry" key={text}><span className="log-time">{formatTime(frame)}</span><span className="log-mark warn" /><span>{text}</span><span className="log-result">RULE-ADJUSTED</span></div>
-                  )) : <div className="log-entry"><span className="log-time">{formatTime(frame)}</span><span className="log-mark" /><span>No configured deterministic safeguard fired.</span><span className="log-result">UNCHANGED</span></div>}
-                </div>
-                  <div className="dash-foot">*“Permitted” means the value remains after the demo’s deterministic checks; nothing is sent to hardware. VPD = 0.61078 × exp(17.27 × T / (T + 237.3)) × (1 − RH/100). Sensor frames are synthetic; recorded controller values are from the notebook’s potato tuber-bulking run. R:B ratios are approximate estimates from model reasoning. No LLM is running on this page, and no live sensing or actuator integration is active.</div>
+                <button className="replay-button" type="button" disabled={!hasReplayData} onClick={() => setPlaying(!playing)} aria-label={playing ? 'Pause replay' : 'Play replay'}>
+                  {playing ? <Pause size={16} /> : <Play size={16} />}{playing ? 'Pause replay' : 'Play replay'}
+                </button>
               </div>
+            </header>
+
+            <section className={`plant-overview ${hasReplayData && outsideProfileCount > 0 ? 'has-excursion' : ''}`} aria-live="polite">
+              <div className="plant-overview-main">
+                <div className="plant-kicker">{activeProfile.medium} <span>·</span> {activeProfile.stage}</div>
+                <h2>{activeProfile.name}</h2>
+                <p className="plant-latin">{activeProfile.latin}</p>
+              </div>
+              <div className="plant-overview-state">
+                <span className={`range-status ${!hasReplayData ? 'unavailable' : outsideProfileCount > 0 ? 'outside' : 'within'}`}>
+                  <i aria-hidden="true" />{!hasReplayData ? 'No replay data' : outsideProfileCount > 0 ? `${outsideProfileCount} profile ranges exceeded` : 'Within configured ranges'}
+                </span>
+                <span className="range-explainer">{hasReplayData ? '3 measured or derived signals checked against this plant profile' : 'This plant has targets, but no measurements in the notebook replay'}</span>
+                {hasReplayData && <span className="frame-readout">FRAME {String(frame + 1).padStart(2, '0')} / 08 <b>{formatTime(frame)}</b></span>}
+              </div>
+              <span className="data-mode">SYNTHETIC · OFFLINE</span>
+            </section>
+
+            {!hasReplayData && <div className="plant-data-empty" role="status">
+              <strong>No dwarf tomato run is included in this dataset.</strong> The target ranges below come from its configured profile; sensor values, proposals, and history are not available.
+            </div>}
+
+            <section className="primary-readings" aria-labelledby="primary-readings-title">
+              <div className="dash-section-heading">
+                <div><span className="section-index">01</span><h3 id="primary-readings-title">Primary readings</h3></div>
+              </div>
+              <div className="signal-grid">
+                {[
+                  { key: 'temperature', label: 'Air temperature', value: hasReplayData ? sample.air.toFixed(1) : '—', unit: '°C', target: `${activeProfile.air[0]}–${activeProfile.air[1]} °C`, outside: hasReplayData && profileChecks[0].outside },
+                  { key: 'moisture', label: 'Substrate moisture', value: hasReplayData ? sample.moisture.toFixed(1) : '—', unit: '%', target: `${activeProfile.moisture[0]}–${activeProfile.moisture[1]}%`, outside: hasReplayData && profileChecks[1].outside },
+                  { key: 'vpd', label: 'Vapor pressure deficit', value: hasReplayData ? vpd.toFixed(2) : '—', unit: 'kPa', target: `${activeProfile.vpd[0].toFixed(1)}–${activeProfile.vpd[1].toFixed(1)} kPa`, outside: hasReplayData && profileChecks[2].outside },
+                ].map((signal) => (
+                  <article className={`signal-card signal-${signal.key}`} key={signal.key}>
+                    <div className="signal-card-head"><span>{signal.label}</span><i aria-hidden="true" /></div>
+                    <div className="signal-value">{signal.value}<small>{hasReplayData && signal.unit}</small></div>
+                    <div className="signal-target">Profile range <b>{signal.target}</b></div>
+                    <div className={`signal-state ${signal.outside ? 'outside' : ''}`}>{hasReplayData ? signal.outside ? 'Outside range' : 'Within range' : 'No reading recorded'}</div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <details className="secondary-readings">
+              <summary><span>All sensor readings</span><span className="details-meta">{hasReplayData ? '4 additional signals' : 'No additional readings for this plant'}</span></summary>
+              <div className="secondary-grid">
+                {[
+                  { key: 'humidity', label: 'Relative humidity', value: hasReplayData ? `${sample.rh}%` : 'Not recorded' },
+                  { key: 'co2', label: 'CO₂ concentration', value: hasReplayData ? `${sample.co2} ppm` : 'Not recorded' },
+                  { key: 'led', label: 'LED temperature', value: hasReplayData ? `${sample.led} °C` : 'Not recorded' },
+                  { key: 'reservoir', label: 'Reservoir level', value: hasReplayData ? `${sample.reservoir}%` : 'Not recorded' },
+                ].map((reading) => <div className={`secondary-reading secondary-${reading.key}`} key={reading.key}>
+                  <span className="secondary-marker" /><span>{reading.label}</span><b>{reading.value}</b>
+                </div>)}
+              </div>
+            </details>
+
+            <div className="dashboard-insights">
+              <section className="ai-assessment" aria-labelledby="ai-assessment-title">
+                <div className="insight-heading">
+                      <div><span className="section-index">02</span><h3 id="ai-assessment-title">AI assessment</h3></div>
+                  <span className="ai-state"><i />Unavailable</span>
+                </div>
+                <p className="ai-empty-title">No model result for this replay</p>
+                <p className="ai-empty-copy">This dashboard reproduces notebook data and does not call an LLM. No live assessment, explanation, or AI-generated recommendation is available here.</p>
+              </section>
+
+              <section className="proposal-panel" aria-labelledby="proposal-title">
+                <div className="insight-heading">
+                  <div><span className="section-index">03</span><h3 id="proposal-title">Controller proposal</h3></div>
+                  {hasReplayData && <span className="proposal-source">Potato notebook replay</span>}
+                </div>
+                {hasReplayData ? <>
+                  <table className="proposal-table">
+                    <thead><tr><th scope="col">Control</th><th scope="col">Proposed</th><th scope="col">Replay rule result</th></tr></thead>
+                    <tbody>
+                      <tr><th scope="row">Irrigation volume</th><td>{proposedIrrigation} ml</td><td>{permittedIrrigation} ml</td></tr>
+                      <tr><th scope="row">Light intensity</th><td>{proposedLight}%</td><td>{permittedLight}%</td></tr>
+                      <tr><th scope="row">Red : blue ratio</th><td>~{redBlueProposal[frame]} : 1</td><td className="not-rule-checked">No rule</td></tr>
+                      <tr><th scope="row">Fan duty</th><td>{fanProposal[frame]}%</td><td className="not-rule-checked">No rule</td></tr>
+                    </tbody>
+                  </table>
+                  <div className="execution-status"><span>Human approval <b>Not connected</b></span><span>Hardware execution <b>Not sent</b></span></div>
+                </> : <p className="proposal-empty">No controller proposal is recorded for the dwarf tomato profile.</p>}
+              </section>
             </div>
+
+            <section className="history-section" aria-labelledby="history-title">
+              <div className="history-heading">
+                <div><span className="section-index">04</span><h3 id="history-title">Sensor history</h3><p>Notebook replay · 12 Oct 2026 · 15-minute samples</p></div>
+                <label className="metric-picker"><span>Signal</span><select id="metric-select" className="select-control" disabled={!hasReplayData} value={metric} onChange={(event) => setMetric(event.target.value as MetricKey)}>
+                  <option value="moisture">Substrate moisture</option><option value="air">Air temperature</option><option value="vpd">Derived VPD</option>
+                </select></label>
+              </div>
+              {hasReplayData ? <>
+                <div className="history-plot"><TelemetryChart metric={metric} crop={crop} activeFrame={frame} /></div>
+                <div className="history-timeline">
+                  <div className="timeline-label"><label htmlFor="frame-range">Replay position</label><span>{formatTime(frame)} · frame {frame + 1} of {frames.length}</span></div>
+                  <input id="frame-range" aria-label="Choose replay frame" type="range" min="0" max="7" step="1" value={frame} onChange={(event) => setFrame(Number(event.target.value))} />
+                  <div className="frame-times">{frames.map((_, index) => <span key={index}>{formatTime(index)}</span>)}</div>
+                </div>
+              </> : <div className="chart-unavailable">History is unavailable until a dwarf tomato telemetry run is added.</div>}
+            </section>
+
+            <details className="technical-details">
+              <summary><span>Technical details</span><span className="details-meta">{hasReplayData ? `${interventions.length} rule adjustment${interventions.length === 1 ? '' : 's'} in this frame` : 'No run-specific rule results'}</span></summary>
+              {hasReplayData ? <div className="technical-content">
+                <div className="rule-reference">
+                  <h4>Configured rule checks</h4>
+                  <p><b>LED thermal cap</b><span>At ≥60°C, cap proposed light intensity at 15%.</span></p>
+                  <p><b>Low reservoir interlock</b><span>Below 5%, set irrigation volume to zero.</span></p>
+                  <p><b>Per-event irrigation cap</b><span>Limit any proposed irrigation event to 150 ml.</span></p>
+                  <p className="vpd-formula">VPD = 0.61078 × exp(17.27 × T / (T + 237.3)) × (1 − RH/100).</p>
+                </div>
+                <div className="rule-events" aria-live="polite">
+                  <h4>Frame {frame + 1} · {formatTime(frame)}</h4>
+                  {interventions.length ? interventions.map((text) => <p className="rule-event adjusted" key={text}><AlertTriangle size={15} />{text}<b>RULE-ADJUSTED</b></p>) : <p className="rule-event"><Check size={15} />No configured rule changed this replay frame.</p>}
+                </div>
+              </div> : <p className="proposal-empty">Rule outcomes are unavailable without a recorded run for this plant.</p>}
+            </details>
           </div>
         </section>}
 
@@ -585,7 +638,6 @@ function AppPage() {
               <h2 className="display" style={{ fontSize: 'clamp(34px,4vw,46px)', lineHeight: 1.06, margin: '12px 0 17px' }}>Small rules.<br />Honest claims.</h2>
               <p>Configured safeguards are intentionally narrow and ordered. They reduce selected actuations when a specified boundary is crossed; they do not establish safe operation of the plant, habitat or crew.</p>
               <p>In this replay, each rule is visible next to the proposed and applied values. A production design would need hazard analysis, fault detection, actuator feedback, and validation across crop stage, hardware and mission conditions.</p>
-              <div className="safety-warning"><strong>Important:</strong> fan duty and spectrum ratio are not bounded by the configured safeguards; irrigation frequency is not bounded either. Rules do not guarantee overall plant safety.</div>
             </div>
             <div>
               <div className="rule-list">
