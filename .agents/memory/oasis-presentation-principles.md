@@ -7,6 +7,8 @@ Do not frame O.A.S.I.S. as a student project. Keep the interactive telemetry das
 
 The user-supplied orbital leaf-and-planet mark is the official O.A.S.I.S. website logo. Keep the exact name expansion visible and do not revert to the generic globe mark.
 
+The user approved the landing-page hero without a duplicate logo lockup; keep the logo in the header, not repeated in the hero.
+
 For the dashboard, foreground one selected plant at a time. Keep the section hierarchy, controls, and empty-state layout consistent across plants; vary crop-specific values and availability states, never reuse another plant's measurements when a crop has no recorded run. Preserve visible, distinct colors for the three primary readings (air temperature, substrate moisture, and VPD), including their values and cues; restraint means no cheap-looking large colored fills, not removing color. Keep other readings secondary. Keep model results, controller proposals, deterministic replay outcomes, human approval, and hardware execution clearly distinct and truthful. Avoid a large enclosing card with many nested boxes and keep dashboard text at readable sizes. Use plant-led photography with warm editorial surfaces and deep foliage accents; avoid dark futuristic treatments and generic SaaS reskins.
 
 **Why:** the user designated the supplied orbital leaf mark as the official logo and asked for readable plant-by-plant views with consistent elements and clear signal identities, while correcting an overcorrection that had made readings too monochrome. They also rejected generic reskins and explicitly selected a framed botanical editorial recording as the landing-page visual reference.
