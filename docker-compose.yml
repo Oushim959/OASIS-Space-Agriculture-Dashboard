@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  oasis-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: oasis-space-agriculture
+    ports:
+      - "5000:5000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - OASIS_MODEL_ID=${OASIS_MODEL_ID:-openai/gpt-oss-120b}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/oasis/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
